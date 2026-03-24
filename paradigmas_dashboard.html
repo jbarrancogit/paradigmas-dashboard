@@ -4163,177 +4163,267 @@
 
     const PRACTICAL_EXERCISES = [
       {
-        id: 'tp-objetos',
-        title: 'TP 1: Clases y Objetos (Java)',
-        category: 'java',
+        id: "tp-objetos",
+        title: "TP 1: Clases y Objetos (Java)",
+        category: "java",
         exercises: [
           {
             number: 1,
-            title: 'Clase Escritura',
-            description: 'Implementar la clase Escritura que modela la informacion de la escritura de una propiedad. Atributos: numero (Integer), superficie (int), domicilio (String). Implementar constructor de inicializacion y de copia. Verificar diferencias entre public, private y constantes. Implementar get()/set() y metodo mostrar().',
-            hints: 'Practica: constructores, encapsulamiento, modificadores de acceso, constructor de copia.',
-            relevance: 'ALTA - Los constructores y encapsulamiento aparecen en el 100% de los examenes finales.'
+            title: "Clase Escritura",
+            description: "Implementar la clase Escritura que modela la informacion de la escritura de una propiedad. Atributos: numero (Integer), superficie (int), domicilio (String). Implementar constructor de inicializacion y de copia. Verificar diferencias entre public, private y constantes. Implementar get()/set() y metodo mostrar().",
+            hints: "Practica: constructores, encapsulamiento, modificadores de acceso, constructor de copia.",
+            relevance: "ALTA - Los constructores y encapsulamiento aparecen en el 100% de los examenes finales.",
+            solution: {
+              hint: "Recorda que el constructor de copia recibe como parametro un objeto del mismo tipo y copia cada uno de sus atributos. Usa this para distinguir atributos de parametros.",
+              stepByStep: "1. Declara la clase con sus 3 atributos privados (Integer numero, int superficie, String domicilio).\n2. Crea el constructor de inicializacion que recibe los 3 parametros y usa this.atributo = parametro.\n3. Crea el constructor de copia que recibe un objeto Escritura y copia sus atributos usando los getters o acceso directo.\n4. Implementa getters y setters para cada atributo.\n5. Implementa mostrar() que usa System.out.println con los datos concatenados.",
+              fullCode: "public class Escritura {\n    private Integer numero;\n    private int superficie;\n    private String domicilio;\n\n    // Constructor de inicializacion\n    public Escritura(Integer numero, int superficie, String domicilio) {\n        this.numero = numero;\n        this.superficie = superficie;\n        this.domicilio = domicilio;\n    }\n\n    // Constructor de copia\n    public Escritura(Escritura otra) {\n        this.numero = otra.numero;\n        this.superficie = otra.superficie;\n        this.domicilio = otra.domicilio;\n    }\n\n    // Getters y Setters\n    public Integer getNumero() { return numero; }\n    public void setNumero(Integer n) { this.numero = n; }\n    public int getSuperficie() { return superficie; }\n    public String getDomicilio() { return domicilio; }\n\n    public void mostrar() {\n        System.out.println(\"Escritura #\" + numero + \" - \" + domicilio + \" (\" + superficie + \"m2)\");\n    }\n}"
+            }
           },
           {
             number: 2,
-            title: 'Clase Lote',
-            description: 'Implementar la clase Lote con: idPadron (Integer, constante), domicilio (String), avaluoxmt (float), superficie (int, constante). Variables publicas deben ser constantes. Metodos: get()/set(), constructor con parametros, metodo auxiliar privado (avaluoxmt * superficie), valuar() que usa el metodo auxiliar, mostrar().',
-            hints: 'Practica: constantes (final), metodos privados auxiliares, relacion entre metodos.',
-            relevance: 'ALTA - El uso de final y metodos privados es frecuente en preguntas V/F.'
+            title: "Clase Lote",
+            description: "Implementar la clase Lote con: idPadron (Integer, constante), domicilio (String), avaluoxmt (float), superficie (int, constante). Variables publicas deben ser constantes. Metodos: get()/set(), constructor con parametros, metodo auxiliar privado (avaluoxmt * superficie), valuar() que usa el metodo auxiliar, mostrar().",
+            hints: "Practica: constantes (final), metodos privados auxiliares, relacion entre metodos.",
+            relevance: "ALTA - El uso de final y metodos privados es frecuente en preguntas V/F.",
+            solution: {
+              hint: "Los atributos constantes se declaran con 'final' y solo pueden inicializarse en el constructor. El metodo auxiliar privado no es accesible desde fuera de la clase.",
+              stepByStep: "1. Declara la clase con atributos: final Integer idPadron, String domicilio, float avaluoxmt, final int superficie.\n2. Como idPadron y superficie son final, deben inicializarse en el constructor y no tendran setter.\n3. Crea el constructor que recibe todos los parametros.\n4. Implementa getters para todos y setters solo para domicilio y avaluoxmt.\n5. Crea el metodo privado auxiliar: private float calcularValuacion() que retorna avaluoxmt * superficie.\n6. Implementa valuar() publico que llama al auxiliar y retorna el resultado.\n7. Implementa mostrar() con los datos del lote.",
+              fullCode: "public class Lote {\n    public final Integer idPadron;\n    private String domicilio;\n    private float avaluoxmt;\n    public final int superficie;\n\n    public Lote(Integer idPadron, String domicilio, float avaluoxmt, int superficie) {\n        this.idPadron = idPadron;\n        this.domicilio = domicilio;\n        this.avaluoxmt = avaluoxmt;\n        this.superficie = superficie;\n    }\n\n    public String getDomicilio() { return domicilio; }\n    public void setDomicilio(String d) { this.domicilio = d; }\n    public float getAvaluoxmt() { return avaluoxmt; }\n    public void setAvaluoxmt(float a) { this.avaluoxmt = a; }\n\n    private float calcularValuacion() {\n        return avaluoxmt * superficie;\n    }\n\n    public float valuar() {\n        return calcularValuacion();\n    }\n\n    public void mostrar() {\n        System.out.println(\"Lote #\" + idPadron + \" - \" + domicilio);\n        System.out.println(\"Superficie: \" + superficie + \"m2\");\n        System.out.println(\"Valuacion: $\" + valuar());\n    }\n}"
+            }
           }
         ]
       },
       {
-        id: 'tp-relaciones',
-        title: 'TP 2: Relaciones (Java)',
-        category: 'java',
+        id: "tp-relaciones",
+        title: "TP 2: Relaciones (Java)",
+        category: "java",
         exercises: [
           {
             number: 1,
-            title: 'Modelo Registro-Lote-Edificio',
-            description: 'Implementar modelo con: Edificio (abstracta), Registro-Lote usando arreglo para cardinalidad n, inicializador static para variable de clase. Metodos: emitirBoletos(), valuar(), registrar(). Relacion entre Registro y Lote con arreglo simple.',
-            hints: 'Practica: clases abstractas, relaciones de asociacion, variables de clase (static), arreglos.',
-            relevance: 'ALTA - Diagramas UML similares aparecen en examenes presenciales. La relacion herencia+composicion+agregacion es clasica.'
+            title: "Modelo Registro-Lote-Edificio",
+            description: "Implementar modelo con: Edificio (abstracta), Registro-Lote usando arreglo para cardinalidad n, inicializador static para variable de clase. Metodos: emitirBoletos(), valuar(), registrar(). Relacion entre Registro y Lote con arreglo simple.",
+            hints: "Practica: clases abstractas, relaciones de asociacion, variables de clase (static), arreglos.",
+            relevance: "ALTA - Diagramas UML similares aparecen en examenes presenciales. La relacion herencia+composicion+agregacion es clasica.",
+            solution: {
+              hint: "Edificio es abstracta porque no se instancia directamente. Registro mantiene un arreglo de Lote[] con un contador para la cantidad actual. El inicializador static se ejecuta una sola vez al cargar la clase.",
+              stepByStep: "1. Crea la clase abstracta Edificio con atributos comunes (direccion, superficie) y metodo abstracto valuar().\n2. Haz que Lote extienda Edificio e implemente valuar() usando avaluoxmt * superficie.\n3. Crea la clase Registro con: una variable static int contadorRegistros (inicializada con bloque static), un arreglo Lote[] lotes y un int cantLotes.\n4. En Registro, implementa registrar(Lote l) que agrega al arreglo y incrementa cantLotes.\n5. Implementa emitirBoletos() que recorre el arreglo y llama valuar() en cada lote.\n6. El bloque static { contadorRegistros = 0; } inicializa la variable de clase.",
+              fullCode: "public abstract class Edificio {\n    protected String direccion;\n    protected int superficie;\n\n    public Edificio(String direccion, int superficie) {\n        this.direccion = direccion;\n        this.superficie = superficie;\n    }\n\n    public abstract float valuar();\n\n    public void mostrar() {\n        System.out.println(\"Direccion: \" + direccion + \" - Superficie: \" + superficie + \"m2\");\n    }\n}\n\npublic class Lote extends Edificio {\n    private float avaluoxmt;\n    public final Integer idPadron;\n\n    public Lote(Integer id, String dir, float avaluo, int sup) {\n        super(dir, sup);\n        this.idPadron = id;\n        this.avaluoxmt = avaluo;\n    }\n\n    public float valuar() {\n        return avaluoxmt * superficie;\n    }\n}\n\npublic class Registro {\n    private static int contadorRegistros;\n    static {\n        contadorRegistros = 0;\n    }\n\n    private Lote[] lotes;\n    private int cantLotes;\n\n    public Registro(int capacidad) {\n        lotes = new Lote[capacidad];\n        cantLotes = 0;\n        contadorRegistros++;\n    }\n\n    public void registrar(Lote l) {\n        if (cantLotes < lotes.length) {\n            lotes[cantLotes] = l;\n            cantLotes++;\n        }\n    }\n\n    public void emitirBoletos() {\n        for (int i = 0; i < cantLotes; i++) {\n            lotes[i].mostrar();\n            System.out.println(\"Valuacion: $\" + lotes[i].valuar());\n        }\n    }\n}"
+            }
           },
           {
             number: 2,
-            title: 'Extensiones: Casa, PH, Departamento',
-            description: 'Agregar clases Casa, PH, Departamento en nuevo package. PH-Departamento con ArrayList parametrizado. Implementar ErrorLote (excepcion personalizada). Persistencia con Serializable.',
-            hints: 'Practica: packages, ArrayList parametrizado, excepciones personalizadas (extends Exception), Serializable.',
-            relevance: 'MUY ALTA - ArrayList parametrizado y excepciones aparecen en examenes virtuales 2025-2026.'
+            title: "Extensiones: Casa, PH, Departamento",
+            description: "Agregar clases Casa, PH, Departamento en nuevo package. PH-Departamento con ArrayList parametrizado. Implementar ErrorLote (excepcion personalizada). Persistencia con Serializable.",
+            hints: "Practica: packages, ArrayList parametrizado, excepciones personalizadas (extends Exception), Serializable.",
+            relevance: "MUY ALTA - ArrayList parametrizado y excepciones aparecen en examenes virtuales 2025-2026.",
+            solution: {
+              hint: "PH contiene una lista de Departamentos (ArrayList<Departamento>). ErrorLote extiende Exception y se lanza cuando se intenta una operacion invalida. Serializable es una interfaz marcadora (sin metodos).",
+              stepByStep: "1. Crea el package 'edificios' con las clases Casa, PH, Departamento.\n2. Casa extiende Edificio con atributo propio (jardin boolean).\n3. Departamento extiende Edificio con atributo piso y numero.\n4. PH extiende Edificio y contiene ArrayList<Departamento> departamentos.\n5. En PH, implementa agregarDepto(Departamento d) y valuar() sumando la valuacion de todos los deptos.\n6. Crea ErrorLote extends Exception con constructor que recibe String mensaje y llama super(mensaje).\n7. En Registro.registrar(), si el lote ya existe, lanza throw new ErrorLote('Lote duplicado').\n8. Implementa Serializable en Edificio: import java.io.Serializable; public abstract class Edificio implements Serializable.",
+              fullCode: "package edificios;\n\nimport java.io.Serializable;\nimport java.util.ArrayList;\n\npublic abstract class Edificio implements Serializable {\n    protected String direccion;\n    protected int superficie;\n\n    public Edificio(String dir, int sup) {\n        this.direccion = dir;\n        this.superficie = sup;\n    }\n    public abstract float valuar();\n}\n\npublic class Casa extends Edificio {\n    private boolean jardin;\n\n    public Casa(String dir, int sup, boolean jardin) {\n        super(dir, sup);\n        this.jardin = jardin;\n    }\n\n    public float valuar() {\n        return superficie * 1500.0f;\n    }\n}\n\npublic class Departamento extends Edificio {\n    private int piso;\n    private String numero;\n\n    public Departamento(String dir, int sup, int piso, String num) {\n        super(dir, sup);\n        this.piso = piso;\n        this.numero = num;\n    }\n\n    public float valuar() {\n        return superficie * 2000.0f;\n    }\n}\n\npublic class PH extends Edificio {\n    private ArrayList<Departamento> departamentos;\n\n    public PH(String dir, int sup) {\n        super(dir, sup);\n        departamentos = new ArrayList<Departamento>();\n    }\n\n    public void agregarDepto(Departamento d) {\n        departamentos.add(d);\n    }\n\n    public float valuar() {\n        float total = 0;\n        for (Departamento d : departamentos) {\n            total += d.valuar();\n        }\n        return total;\n    }\n}\n\npublic class ErrorLote extends Exception {\n    public ErrorLote(String mensaje) {\n        super(mensaje);\n    }\n}"
+            }
           }
         ]
       },
       {
-        id: 'tp-aplicaciones',
-        title: 'TP 3: Aplicaciones (Java)',
-        category: 'java',
+        id: "tp-aplicaciones",
+        title: "TP 3: Aplicaciones (Java)",
+        category: "java",
         exercises: [
           {
             number: 1,
-            title: 'Modelo Persona-Estudiante-Profesor-Curso',
-            description: 'Implementar en dos packages (Miembros y Asignaturas). Metodos: inscribir, inscriptos, dicta. Curso hereda de HashTable. ErrorInscripcion si alumno se inscribe en mas de 3 cursos. Parametrizar Curso para solo aceptar Inscripcion.',
-            hints: 'Practica: packages, herencia de contenedores, excepciones, generics, interfaces.',
-            relevance: 'MUY ALTA - Combina herencia + excepciones + generics, los 3 temas mas evaluados.'
+            title: "Modelo Persona-Estudiante-Profesor-Curso",
+            description: "Implementar en dos packages (Miembros y Asignaturas). Metodos: inscribir, inscriptos, dicta. Curso hereda de HashTable. ErrorInscripcion si alumno se inscribe en mas de 3 cursos. Parametrizar Curso para solo aceptar Inscripcion.",
+            hints: "Practica: packages, herencia de contenedores, excepciones, generics, interfaces.",
+            relevance: "MUY ALTA - Combina herencia + excepciones + generics, los 3 temas mas evaluados.",
+            solution: {
+              hint: "Curso extiende Hashtable<Integer, Inscripcion> donde Integer es el legajo del alumno. Antes de inscribir, conta cuantos cursos tiene el alumno y si son >= 3, lanza ErrorInscripcion.",
+              stepByStep: "1. Package miembros: Crea clase abstracta Persona con nombre y DNI. Estudiante extiende Persona con legajo. Profesor extiende Persona con cargo.\n2. Package asignaturas: Crea clase Inscripcion con Estudiante y nota.\n3. Curso extiende Hashtable<Integer, Inscripcion> con atributo nombre y Profesor.\n4. En Curso, metodo inscribir(Estudiante e) crea una Inscripcion, verifica que el alumno no este en mas de 3 cursos, y hace put(e.getLegajo(), inscripcion).\n5. Si supera 3 cursos: throw new ErrorInscripcion('Limite de cursos excedido').\n6. inscriptos() retorna this.values() (las inscripciones).\n7. ErrorInscripcion extends Exception con constructor String.",
+              fullCode: "// Package miembros\npackage miembros;\n\npublic abstract class Persona {\n    protected String nombre;\n    protected int dni;\n\n    public Persona(String nombre, int dni) {\n        this.nombre = nombre;\n        this.dni = dni;\n    }\n    public String getNombre() { return nombre; }\n    public int getDni() { return dni; }\n}\n\npublic class Estudiante extends Persona {\n    private int legajo;\n    private int cursosInscriptos;\n\n    public Estudiante(String nombre, int dni, int legajo) {\n        super(nombre, dni);\n        this.legajo = legajo;\n        this.cursosInscriptos = 0;\n    }\n    public int getLegajo() { return legajo; }\n    public int getCursosInscriptos() { return cursosInscriptos; }\n    public void incrementarCursos() { cursosInscriptos++; }\n}\n\npublic class Profesor extends Persona {\n    private String cargo;\n\n    public Profesor(String nombre, int dni, String cargo) {\n        super(nombre, dni);\n        this.cargo = cargo;\n    }\n    public String getCargo() { return cargo; }\n}\n\n// Package asignaturas\npackage asignaturas;\n\nimport miembros.*;\nimport java.util.Hashtable;\nimport java.util.Collection;\n\npublic class Inscripcion {\n    private Estudiante estudiante;\n    private float nota;\n\n    public Inscripcion(Estudiante e) {\n        this.estudiante = e;\n        this.nota = 0;\n    }\n    public Estudiante getEstudiante() { return estudiante; }\n    public float getNota() { return nota; }\n    public void setNota(float n) { this.nota = n; }\n}\n\npublic class ErrorInscripcion extends Exception {\n    public ErrorInscripcion(String msg) {\n        super(msg);\n    }\n}\n\npublic class Curso extends Hashtable<Integer, Inscripcion> {\n    private String nombre;\n    private Profesor profesor;\n\n    public Curso(String nombre, Profesor prof) {\n        this.nombre = nombre;\n        this.profesor = prof;\n    }\n\n    public void inscribir(Estudiante e) throws ErrorInscripcion {\n        if (e.getCursosInscriptos() >= 3) {\n            throw new ErrorInscripcion(\"Limite de cursos excedido para \" + e.getNombre());\n        }\n        Inscripcion insc = new Inscripcion(e);\n        this.put(e.getLegajo(), insc);\n        e.incrementarCursos();\n    }\n\n    public Collection<Inscripcion> inscriptos() {\n        return this.values();\n    }\n\n    public Profesor dicta() {\n        return this.profesor;\n    }\n}"
+            }
           },
           {
             number: 2,
-            title: 'Modelo Vehiculo-Fabrica-Componentes',
-            description: 'Packages: Principal (Main, Fabrica), Componentes (Rueda=agregacion, Motor=asociacion, Chasis=composicion), Vehiculos (interfaces Vehiculo y Producto, clases Auto y Camion). Fabrica.crear() sobrecargado.',
-            hints: 'Practica: composicion vs agregacion vs asociacion, interfaces, sobrecarga, packages.',
-            relevance: 'MUY ALTA - La distincion composicion/agregacion/asociacion es pregunta clasica de examen.'
+            title: "Modelo Vehiculo-Fabrica-Componentes",
+            description: "Packages: Principal (Main, Fabrica), Componentes (Rueda=agregacion, Motor=asociacion, Chasis=composicion), Vehiculos (interfaces Vehiculo y Producto, clases Auto y Camion). Fabrica.crear() sobrecargado.",
+            hints: "Practica: composicion vs agregacion vs asociacion, interfaces, sobrecarga, packages.",
+            relevance: "MUY ALTA - La distincion composicion/agregacion/asociacion es pregunta clasica de examen.",
+            solution: {
+              hint: "Composicion: Chasis se crea DENTRO del vehiculo (muere con el). Agregacion: Rueda existe independiente pero pertenece al vehiculo. Asociacion: Motor puede estar vinculado a otro objeto sin pertenecer exclusivamente.",
+              stepByStep: "1. Package componentes: Crea Rueda (radio, marca), Motor (potencia, cilindros), Chasis (material, tipo).\n2. Package vehiculos: Crea interface Vehiculo con arrancar(), frenar(). Crea interface Producto con getCosto().\n3. Auto implementa Vehiculo y Producto. Tiene: Chasis (composicion, se crea en constructor), Rueda[] (agregacion, se recibe por parametro), Motor (asociacion, se recibe y puede compartirse).\n4. Camion similar a Auto pero con mas ruedas y motor mas potente.\n5. Package principal: Fabrica tiene crear(String tipo) sobrecargado: crear('auto') y crear('camion').\n6. La clave: en Auto, el Chasis se instancia con new dentro del constructor (composicion). Las Ruedas se pasan al constructor (agregacion). El Motor se pasa como referencia (asociacion).",
+              fullCode: "// Package componentes\npackage componentes;\n\npublic class Rueda {\n    private float radio;\n    private String marca;\n    public Rueda(float radio, String marca) {\n        this.radio = radio;\n        this.marca = marca;\n    }\n    public float getRadio() { return radio; }\n}\n\npublic class Motor {\n    private int potencia;\n    private int cilindros;\n    public Motor(int potencia, int cilindros) {\n        this.potencia = potencia;\n        this.cilindros = cilindros;\n    }\n    public int getPotencia() { return potencia; }\n}\n\npublic class Chasis {\n    private String material;\n    private String tipo;\n    public Chasis(String material, String tipo) {\n        this.material = material;\n        this.tipo = tipo;\n    }\n    public String getTipo() { return tipo; }\n}\n\n// Package vehiculos\npackage vehiculos;\n\nimport componentes.*;\n\npublic interface Vehiculo {\n    void arrancar();\n    void frenar();\n}\n\npublic interface Producto {\n    float getCosto();\n}\n\npublic class Auto implements Vehiculo, Producto {\n    private Chasis chasis;    // COMPOSICION: se crea internamente\n    private Rueda[] ruedas;   // AGREGACION: se recibe, existe independiente\n    private Motor motor;      // ASOCIACION: referencia externa\n\n    public Auto(Rueda[] ruedas, Motor motor) {\n        this.chasis = new Chasis(\"Acero\", \"Sedan\"); // composicion\n        this.ruedas = ruedas;   // agregacion\n        this.motor = motor;     // asociacion\n    }\n\n    public void arrancar() {\n        System.out.println(\"Auto arrancando con motor de \" + motor.getPotencia() + \"HP\");\n    }\n    public void frenar() {\n        System.out.println(\"Auto frenando\");\n    }\n    public float getCosto() {\n        return 25000.0f;\n    }\n}\n\npublic class Camion implements Vehiculo, Producto {\n    private Chasis chasis;\n    private Rueda[] ruedas;\n    private Motor motor;\n\n    public Camion(Rueda[] ruedas, Motor motor) {\n        this.chasis = new Chasis(\"Acero reforzado\", \"Camion\");\n        this.ruedas = ruedas;\n        this.motor = motor;\n    }\n\n    public void arrancar() {\n        System.out.println(\"Camion arrancando\");\n    }\n    public void frenar() {\n        System.out.println(\"Camion frenando\");\n    }\n    public float getCosto() {\n        return 80000.0f;\n    }\n}\n\n// Package principal\npackage principal;\n\nimport vehiculos.*;\nimport componentes.*;\n\npublic class Fabrica {\n    public static Auto crear(String color) {\n        Rueda[] ruedas = { new Rueda(16, \"Pirelli\"), new Rueda(16, \"Pirelli\"),\n                           new Rueda(16, \"Pirelli\"), new Rueda(16, \"Pirelli\") };\n        Motor motor = new Motor(150, 4);\n        return new Auto(ruedas, motor);\n    }\n\n    public static Camion crear(int carga) {\n        Rueda[] ruedas = new Rueda[6];\n        for (int i = 0; i < 6; i++) ruedas[i] = new Rueda(22, \"Firestone\");\n        Motor motor = new Motor(400, 6);\n        return new Camion(ruedas, motor);\n    }\n}"
+            }
           }
         ]
       },
       {
-        id: 'tp-prolog',
-        title: 'TP 4: Prolog',
-        category: 'prolog',
+        id: "tp-prolog",
+        title: "TP 4: Prolog",
+        category: "prolog",
         exercises: [
           {
-            number: '1-4',
-            title: 'Hechos y Reglas Basicas',
-            description: '1. par(N) sin usar mod. 2. suma(N,S) sumatoria primeros N pares. 3. potencia(B,E,V). 4. fibonacci(N,R).',
-            hints: 'Practica: recursion basica, caso base + caso recursivo, aritmetica con is.',
-            relevance: 'MEDIA - Estos ejercicios basicos rara vez aparecen en finales, pero son la base para entender los demas.'
+            number: "1-4",
+            title: "Hechos y Reglas Basicas",
+            description: "1. par(N) sin usar mod. 2. suma(N,S) sumatoria primeros N pares. 3. potencia(B,E,V). 4. fibonacci(N,R).",
+            hints: "Practica: recursion basica, caso base + caso recursivo, aritmetica con is.",
+            relevance: "MEDIA - Estos ejercicios basicos rara vez aparecen en finales, pero son la base para entender los demas.",
+            solution: {
+              hint: "Para par(N) sin mod, pensa que un numero es par si al restarle 2 sucesivamente llegas a 0. El caso base es par(0). Para fibonacci, necesitas dos casos base: fibonacci(1,0) y fibonacci(2,1).",
+              stepByStep: "1. par(N): Caso base par(0). Caso recursivo: N > 1, N1 is N - 2, par(N1). Restamos de a 2 hasta llegar a 0.\n2. sumapares(N,S): Caso base sumapares(1,2) (el primer par es 2). Recursivo: sumapares(N-1, S1), S is S1 + N*2. El n-esimo par es N*2.\n3. potencia(B,E,V): Caso base potencia(_,0,1) (todo elevado a 0 es 1). Recursivo: E1 is E-1, potencia(B,E1,V1), V is V1*B.\n4. fibonacci(N,R): Casos base fibonacci(1,0) y fibonacci(2,1). Recursivo: calcular fibonacci de N-1 y N-2, sumar resultados.",
+              fullCode: "% 1. par(N) sin mod - resta de a 2\npar(0).\npar(N) :- N > 1, N1 is N - 2, par(N1).\n\n% 2. suma(N, S) sumatoria de primeros N numeros pares\nsumapares(1, 2).\nsumapares(N, S) :- N > 1, N1 is N-1, sumapares(N1, S1), S is S1 + N*2.\n\n% 3. potencia(B, E, V)\npotencia(_, 0, 1).\npotencia(B, E, V) :- E > 0, E1 is E-1, potencia(B, E1, V1), V is V1 * B.\n\n% 4. fibonacci(N, R)\nfibonacci(1, 0).\nfibonacci(2, 1).\nfibonacci(N, R) :- N > 2, N1 is N-1, N2 is N-2,\n    fibonacci(N1, R1), fibonacci(N2, R2), R is R1 + R2."
+            }
           },
           {
-            number: '5-6',
-            title: 'Circuito Logico y Diagnostico',
-            description: '5. Definir and/or/not y circuito(Q1,Q2,S). 6. Definir sintoma(P,S), enfermedad(E,S) y diagnostico(P,S,E).',
-            hints: 'Practica: hechos como base de datos, reglas con multiples condiciones.',
-            relevance: 'MEDIA - El concepto de base de datos Prolog aparece en preguntas conceptuales.'
+            number: "5-6",
+            title: "Circuito Logico y Diagnostico",
+            description: "5. Definir and/or/not y circuito(Q1,Q2,S). 6. Definir sintoma(P,S), enfermedad(E,S) y diagnostico(P,S,E).",
+            hints: "Practica: hechos como base de datos, reglas con multiples condiciones.",
+            relevance: "MEDIA - El concepto de base de datos Prolog aparece en preguntas conceptuales.",
+            solution: {
+              hint: "Para el circuito logico, defini and/or/not como hechos y reglas simples. Para diagnostico, la relacion es: si una persona tiene un sintoma y ese sintoma corresponde a una enfermedad, entonces tiene esa enfermedad.",
+              stepByStep: "1. Circuito: Define and(1,1,1), and(1,0,0), and(0,1,0), and(0,0,0) como hechos. Similar para or. not(0,1) y not(1,0).\n2. circuito(Q1,Q2,S): Combina las compuertas segun el circuito pedido. Ej: not(Q1,NQ1), and(NQ1,Q2,S).\n3. Diagnostico: Define hechos sintoma(juan, fiebre). sintoma(juan, tos). enfermedad(gripe, [fiebre, tos]).\n4. diagnostico(P,E): persona P tiene enfermedad E si todos los sintomas de E los tiene P.",
+              fullCode: "% 5. Circuito logico\nand(1, 1, 1).\nand(1, 0, 0).\nand(0, 1, 0).\nand(0, 0, 0).\n\nor(1, 1, 1).\nor(1, 0, 1).\nor(0, 1, 1).\nor(0, 0, 0).\n\nnot(0, 1).\nnot(1, 0).\n\ncircuito(Q1, Q2, S) :- not(Q1, NQ1), and(NQ1, Q2, A), or(Q1, Q2, B), and(A, B, S).\n\n% 6. Diagnostico medico\nsintoma(juan, fiebre).\nsintoma(juan, tos).\nsintoma(maria, dolor_cabeza).\nsintoma(maria, fiebre).\n\nenfermedad(gripe, fiebre).\nenfermedad(gripe, tos).\nenfermedad(migrana, dolor_cabeza).\n\ndiagnostico(Persona, Enfermedad) :-\n    sintoma(Persona, Sintoma),\n    enfermedad(Enfermedad, Sintoma)."
+            }
           },
           {
-            number: '7-12',
-            title: 'Tratamiento de Listas (Basico)',
-            description: '7. predecesor(L,R) elementos >= predecesor. 8. rotada(L,N,P) rotacion izquierda. 9. suma(S,L). 10. cantidad(L,N). 11. ultimo(L,U). 12. inversa(L,I).',
-            hints: 'Practica: recursion sobre listas, cabeza|cola, append, caso base lista vacia.',
-            relevance: 'MUY ALTA - Escribir predicados sobre listas aparece en TODOS los examenes finales.'
+            number: "7-12",
+            title: "Tratamiento de Listas (Basico)",
+            description: "7. predecesor(L,R) elementos >= predecesor. 8. rotada(L,N,P) rotacion izquierda. 9. suma(S,L). 10. cantidad(L,N). 11. ultimo(L,U). 12. inversa(L,I).",
+            hints: "Practica: recursion sobre listas, cabeza|cola, append, caso base lista vacia.",
+            relevance: "MUY ALTA - Escribir predicados sobre listas aparece en TODOS los examenes finales.",
+            solution: {
+              hint: "Toda recursion sobre listas tiene el patron [Cabeza|Cola]. El caso base suele ser la lista vacia [] o la lista con un solo elemento [X]. Para append, recorda que append([], L, L) y append([H|T], L, [H|R]) :- append(T, L, R).",
+              stepByStep: "7. predecesor: Si la lista tiene un elemento, el resultado es esa lista. Si tiene dos o mas, compara el primero con el segundo: si A =< B, incluye A en el resultado; si A > B, lo descarta.\n8. rotada: Caso base rotada(X, 0, X). Recursivo: saca la cabeza, la agrega al final con append, y rota N-1 veces.\n9. suma: Caso base suma(0, []). Recursivo: suma(S, [X|C]) :- suma(S1, C), S is S1 + X.\n10. cantidad: Caso base cantidad([], 0). Recursivo: cantidad([_|C], N) :- cantidad(C, N1), N is N1 + 1.\n11. ultimo: Caso base ultimo([X], X). Recursivo: ultimo([_|C], U) :- ultimo(C, U). Ignora la cabeza.\n12. inversa: Caso base inversa([], []). Recursivo: invierte la cola y agrega la cabeza al final con append.",
+              fullCode: "% 7. predecesor - elementos mayores o iguales a su predecesor\npredecesor([A], [A]).\npredecesor([A,B|C], [A|R]) :- A =< B, predecesor([B|C], R).\npredecesor([A,B|C], R) :- A > B, predecesor([B|C], R).\n\n% 8. rotada - rotacion izquierda N posiciones\nrotada(X, 0, X).\nrotada([H|T], N, R) :- N > 0, N1 is N-1, append(T, [H], L1), rotada(L1, N1, R).\n\n% 9. suma de elementos\nsuma(0, []).\nsuma(S, [X|C]) :- suma(S1, C), S is S1 + X.\n\n% 10. cantidad de elementos\ncantidad([], 0).\ncantidad([_|C], N) :- cantidad(C, N1), N is N1 + 1.\n\n% 11. ultimo elemento\nultimo([X], X).\nultimo([_|C], U) :- ultimo(C, U).\n\n% 12. inversa de una lista\ninversa([], []).\ninversa([X|C], R) :- inversa(C, Ci), append(Ci, [X], R)."
+            }
           },
           {
-            number: '13-20',
-            title: 'Tratamiento de Listas (Avanzado)',
-            description: '13. sacar(P,L,R) sin elemento en posicion P. 14. eliminar(L,E,R) una ocurrencia. 15. eliminar todas. 16. interseccion(L1,L2,L3). 17. rotarIzq(L,N,R). 18. insertarEn(E,L,P,R). 19. insOrden(E,O,D). 20. ordenada(L,O) usando insOrden.',
-            hints: 'Practica: operaciones avanzadas de listas, corte (!), not/miembro.',
-            relevance: 'ALTA - insOrden y ordenada aparecen como ejercicios de examen. Tambien interseccion.'
+            number: "13-20",
+            title: "Tratamiento de Listas (Avanzado)",
+            description: "13. sacar(P,L,R) sin elemento en posicion P. 14. eliminar(L,E,R) una ocurrencia. 15. eliminar todas. 16. interseccion(L1,L2,L3). 17. rotarIzq(L,N,R). 18. insertarEn(E,L,P,R). 19. insOrden(E,O,D). 20. ordenada(L,O) usando insOrden.",
+            hints: "Practica: operaciones avanzadas de listas, corte (!), not/miembro.",
+            relevance: "ALTA - insOrden y ordenada aparecen como ejercicios de examen. Tambien interseccion.",
+            solution: {
+              hint: "Para sacar en posicion P, usa un contador que decrementa. Para eliminar con !, el corte evita que busque mas ocurrencias. insOrden inserta en la posicion correcta comparando con cada elemento. ordenada usa insOrden iterativamente.",
+              stepByStep: "13. sacar(P,L,R): Si P=1, el resultado es la cola. Si P>1, mantene la cabeza y saca de la cola con P-1.\n14. eliminar una ocurrencia: Si la cabeza es E, el resultado es la cola (con ! para no seguir buscando). Si no, conserva la cabeza y busca en la cola.\n15. eliminar todas: Similar pero sin el corte (!), asi sigue buscando en toda la lista.\n16. interseccion: Si la cabeza de L1 es miembro de L2, la incluye en el resultado. Si no, la descarta.\n17. rotarIzq: Igual que rotada del ejercicio 8.\n18. insertarEn(E,L,P,R): Si P=1, pone E al inicio. Si P>1, mantene la cabeza y decrementa P.\n19. insOrden(E,O,D): Si la lista esta vacia, resultado es [E]. Si E =< cabeza, lo inserta antes. Si no, conserva la cabeza y busca posicion en la cola.\n20. ordenada(L,O): Ordena la cola recursivamente, luego inserta la cabeza con insOrden.",
+              fullCode: "% 13. sacar elemento en posicion P\nsacar(1, [_|C], C).\nsacar(P, [H|C], [H|R]) :- P > 1, P1 is P-1, sacar(P1, C, R).\n\n% 14. eliminar una ocurrencia de E\neliminar(_, [], []).\neliminar(E, [E|C], C) :- !.\neliminar(E, [H|C], [H|R]) :- eliminar(E, C, R).\n\n% 15. eliminar todas las ocurrencias de E\neliminartodos(_, [], []).\neliminartodos(E, [E|C], R) :- eliminartodos(E, C, R).\neliminartodos(E, [H|C], [H|R]) :- H \\= E, eliminartodos(E, C, R).\n\n% 16. interseccion de dos listas\ninterseccion([], _, []).\ninterseccion([H|T], L2, [H|R]) :- member(H, L2), !, interseccion(T, L2, R).\ninterseccion([_|T], L2, R) :- interseccion(T, L2, R).\n\n% 17. rotarIzq (equivalente a rotada)\nrotarIzq(X, 0, X).\nrotarIzq([H|T], N, R) :- N > 0, N1 is N-1, append(T, [H], L1), rotarIzq(L1, N1, R).\n\n% 18. insertarEn(E, L, P, R) - insertar E en posicion P\ninsertarEn(E, L, 1, [E|L]).\ninsertarEn(E, [H|C], P, [H|R]) :- P > 1, P1 is P-1, insertarEn(E, C, P1, R).\n\n% 19. insOrden - insertar en lista ordenada\ninsOrden(E, [], [E]).\ninsOrden(E, [H|T], [E,H|T]) :- E =< H, !.\ninsOrden(E, [H|T], [H|R]) :- insOrden(E, T, R).\n\n% 20. ordenada - ordenamiento por insercion\nordenada([], []).\nordenada([H|T], R) :- ordenada(T, R1), insOrden(H, R1, R)."
+            }
           },
           {
-            number: '21-24',
-            title: 'Estructuras de Datos',
-            description: '21. Arbol con functor persona(nombre,dni,edad): mostrar descendientes y ascendientes. 22. parejas(L1,L2,L3). 23. Base de datos persona(nombre,telefono,sexo,edad). 24. Grafo de ciudades: camino, distancia.',
-            hints: 'Practica: functores, arboles, grafos, busqueda en profundidad.',
-            relevance: 'MEDIA-ALTA - Los functores y arboles aparecen en preguntas conceptuales y en arboles de resolucion.'
+            number: "21-24",
+            title: "Estructuras de Datos",
+            description: "21. Arbol con functor persona(nombre,dni,edad): mostrar descendientes y ascendientes. 22. parejas(L1,L2,L3). 23. Base de datos persona(nombre,telefono,sexo,edad). 24. Grafo de ciudades: camino, distancia.",
+            hints: "Practica: functores, arboles, grafos, busqueda en profundidad.",
+            relevance: "MEDIA-ALTA - Los functores y arboles aparecen en preguntas conceptuales y en arboles de resolucion.",
+            solution: {
+              hint: "Los arboles en Prolog se representan con hechos nodo(Padre, ListaHijos). Para recorrerlos, usa recursion sobre la lista de hijos. findall/3 es util para recopilar todos los resultados de un predicado.",
+              stepByStep: "21. Define nodos con nodo(padre, [lista_hijos]). descendientes(X, D) busca hijos de X y recursivamente sus hijos. Usa findall para recopilar.\n22. parejas: Caso base parejas([], [], []). Recursivo: toma las cabezas de ambas listas y forma una tupla (X,Y).\n23. Define hechos persona(nombre, tel, sexo, edad). Crea predicados buscar(N) que verifica existencia, mujeres que lista mujeres usando fail para forzar backtracking, varones_mayores que filtra por sexo m y edad > 21.\n24. Grafo: Define arista(ciudad1, ciudad2, distancia). camino usa recursion evitando ciclos con lista de visitados.",
+              fullCode: "% 21. Arbol con functores\nnodo(r, [a, b, c]).\nnodo(a, [d, e]).\nnodo(b, [f]).\nnodo(c, [g]).\nnodo(d, [h]).\nnodo(e, [i, j]).\n\ndescendientes(X, D) :- nodo(X, Hijos),\n    findall(Y, (member(H, Hijos), (Y = H ; descendientes(H, Y))), D).\n\n% 22. parejas - emparejar elementos de dos listas\nparejas([], [], []).\nparejas([X|Xs], [Y|Ys], [(X,Y)|Ps]) :- parejas(Xs, Ys, Ps).\n\n% 23. Base de datos de personas\npersona(juan, 12345, m, 25).\npersona(maria, 67890, f, 30).\npersona(ana, 11111, f, 19).\npersona(pedro, 22222, m, 35).\n\nbuscar(N) :- persona(N, _, _, _).\n\nmujeres :- persona(N, _, f, _), write(N), nl, fail ; true.\n\nvarones_mayores :- persona(N, _, m, E), E > 21, write(N), nl, fail ; true."
+            }
           }
         ]
       },
       {
-        id: 'tp-haskell',
-        title: 'TP 5: Haskell',
-        category: 'haskell',
+        id: "tp-haskell",
+        title: "TP 5: Haskell",
+        category: "haskell",
         exercises: [
           {
-            number: '1-4',
-            title: 'Definiciones Funcionales (Patrones)',
-            description: '1. potencia :: Int->Int->Int. 2. valAbsoluto :: Int->Int. 3. sumatoria :: Int->Int. 4. divisor :: Int->Int->Bool (restas sucesivas, sin mod).',
-            hints: 'Practica: pattern matching, recursion, caso base.',
-            relevance: 'ALTA - Las definiciones con patrones son la base de todas las preguntas de Haskell en examenes.'
+            number: "1-4",
+            title: "Definiciones Funcionales (Patrones)",
+            description: "1. potencia :: Int->Int->Int. 2. valAbsoluto :: Int->Int. 3. sumatoria :: Int->Int. 4. divisor :: Int->Int->Bool (restas sucesivas, sin mod).",
+            hints: "Practica: pattern matching, recursion, caso base.",
+            relevance: "ALTA - Las definiciones con patrones son la base de todas las preguntas de Haskell en examenes.",
+            solution: {
+              hint: "En Haskell, el pattern matching se hace directamente en los parametros de la funcion. El caso base va primero. Para divisor con restas sucesivas, resta b - a sucesivamente hasta que sean iguales (True) o b < a (False).",
+              stepByStep: "1. potencia: Caso base potencia _ 0 = 1 (cualquier base elevada a 0 es 1). Recursivo: potencia b e = b * potencia b (e-1).\n2. valAbsoluto: Usa guardas. Si x >= 0 retorna x, otherwise retorna -x.\n3. sumatoria: Caso base sumatoria 0 = 0. Recursivo: sumatoria n = n + sumatoria (n-1).\n4. divisor: No uses mod. Si a == b, True. Si a > b, False (b es menor, no puede ser divisor). Otherwise, divisor a (b - a) resta a de b sucesivamente.",
+              fullCode: "-- 1. potencia con patrones\npotencia :: Int -> Int -> Int\npotencia _ 0 = 1\npotencia b e = b * potencia b (e-1)\n\n-- 2. valor absoluto con guardas\nvalAbsoluto :: Int -> Int\nvalAbsoluto x\n  | x >= 0    = x\n  | otherwise = -x\n\n-- 3. sumatoria de 1 a n\nsumatoria :: Int -> Int\nsumatoria 0 = 0\nsumatoria n = n + sumatoria (n-1)\n\n-- 4. divisor por restas sucesivas (sin mod)\ndivisor :: Int -> Int -> Bool\ndivisor _ 0 = False\ndivisor a b\n  | a == b    = True\n  | a > b     = False\n  | otherwise = divisor a (b - a)"
+            }
           },
           {
-            number: '5-8',
-            title: 'Guardas y Lambda',
-            description: '5. divisor con guardas. 6. mcd :: Int->Int->Int (algoritmo de restos). 7. Lambda Int->Int->Int mayor. 8. Lambda Int->Bool par.',
-            hints: 'Practica: guardas (|), otherwise, expresiones lambda (\\x -> ...).',
-            relevance: 'MUY ALTA - Las guardas y lambda aparecen en todos los examenes. Evaluar expresiones lambda es pregunta clasica.'
+            number: "5-8",
+            title: "Guardas y Lambda",
+            description: "5. divisor con guardas. 6. mcd :: Int->Int->Int (algoritmo de restos). 7. Lambda Int->Int->Int mayor. 8. Lambda Int->Bool par.",
+            hints: "Practica: guardas (|), otherwise, expresiones lambda (\\x -> ...).",
+            relevance: "MUY ALTA - Las guardas y lambda aparecen en todos los examenes. Evaluar expresiones lambda es pregunta clasica.",
+            solution: {
+              hint: "El mcd (maximo comun divisor) usa el algoritmo de Euclides: mcd(a,0) = a, mcd(a,b) = mcd(b, a mod b). Las lambdas se escriben con barra invertida: (\\x -> expresion).",
+              stepByStep: "5. divisor con guardas: Misma logica que el ejercicio 4, ya usa guardas.\n6. mcd: Caso base mcd a 0 = a. Recursivo: mcd a b = mcd b (mod a b). Es el algoritmo de Euclides.\n7. Lambda mayor: (\\x y -> if x >= y then x else y). Recibe dos enteros y retorna el mayor.\n8. Lambda par: (\\x -> mod x 2 == 0). Recibe un entero y retorna True si es par.",
+              fullCode: "-- 5. divisor con guardas (mismo que ej 4)\ndivisorG :: Int -> Int -> Bool\ndivisorG _ 0 = False\ndivisorG a b\n  | a == b    = True\n  | a > b     = False\n  | otherwise = divisorG a (b - a)\n\n-- 6. mcd - algoritmo de Euclides\nmcd :: Int -> Int -> Int\nmcd a 0 = a\nmcd a b = mcd b (mod a b)\n\n-- 7. Lambda que retorna el mayor de dos numeros\n-- (\\x y -> if x >= y then x else y) 3 5  => 5\nlambdaMayor = \\x y -> if x >= y then x else y\n\n-- 8. Lambda que verifica si un numero es par\n-- (\\x -> mod x 2 == 0) 4  => True\nlambdaPar = \\x -> mod x 2 == 0"
+            }
           },
           {
-            number: '1-5 (Listas)',
-            title: 'Tratamiento de Listas',
-            description: '1. Analizar q1 (genera sublistas). 2. suma polimcrfica. 3. cantidad. 4. ultimo con guardas y patrones. 5. inversa.',
-            hints: 'Practica: listas, head/tail, recursion, polimorfismo.',
-            relevance: 'MUY ALTA - Funciones recursivas sobre listas son el ejercicio mas comun en finales de Haskell.'
+            number: "1-5 (Listas)",
+            title: "Tratamiento de Listas",
+            description: "1. Analizar q1 (genera sublistas). 2. suma polimorfica. 3. cantidad. 4. ultimo con guardas y patrones. 5. inversa.",
+            hints: "Practica: listas, head/tail, recursion, polimorfismo.",
+            relevance: "MUY ALTA - Funciones recursivas sobre listas son el ejercicio mas comun en finales de Haskell.",
+            solution: {
+              hint: "Toda funcion sobre listas en Haskell usa el patron (x:xs) donde x es la cabeza y xs la cola. El caso base es la lista vacia []. El tipo polimorfico se indica con variables de tipo: [a] -> a.",
+              stepByStep: "2. suma: Tipo Num a => [a] -> a. Caso base suma [] = 0. Recursivo: suma (x:xs) = x + suma xs. La restriccion Num a permite sumar cualquier tipo numerico.\n3. cantidad: Tipo [a] -> Int. Caso base cantidad [] = 0. Recursivo: cantidad (_:xs) = 1 + cantidad xs. Usamos _ porque no nos importa el valor.\n4. ultimo: Tipo [a] -> a. Caso base ultimo [x] = x (lista con un solo elemento). Recursivo: ultimo (_:xs) = ultimo xs. Ignora la cabeza.\n5. inversa: Tipo [a] -> [a]. Caso base inversa [] = []. Recursivo: inversa (x:xs) = inversa xs ++ [x]. Invierte la cola y agrega x al final.",
+              fullCode: "-- 2. suma polimorfica\nsuma :: Num a => [a] -> a\nsuma [] = 0\nsuma (x:xs) = x + suma xs\n\n-- 3. cantidad de elementos\ncantidad :: [a] -> Int\ncantidad [] = 0\ncantidad (_:xs) = 1 + cantidad xs\n\n-- 4. ultimo elemento\nultimo :: [a] -> a\nultimo [x] = x\nultimo (_:xs) = ultimo xs\n\n-- 5. inversa de una lista\ninversa :: [a] -> [a]\ninversa [] = []\ninversa (x:xs) = inversa xs ++ [x]"
+            }
           },
           {
-            number: '6-12 (Listas)',
-            title: 'Listas Avanzadas + Currificacion',
-            description: '6. sacar. 7. eliminar. 8. intersec. 9. rotarIzq. 10. insertarEn. 11. insertOrd. 12. ordenada. 13-14. Currificacion con map sobre potencia y mcd.',
-            hints: 'Practica: operaciones avanzadas, Ord a =>, currificacion, map.',
-            relevance: 'ALTA - insertOrd/ordenada y currificacion con map aparecen en examenes.'
+            number: "6-14 (Listas)",
+            title: "Listas Avanzadas + Currificacion",
+            description: "6. sacar. 7. eliminar. 8. intersec. 9. rotarIzq. 10. insertarEn. 11. insertOrd. 12. ordenada. 13-14. Currificacion con map sobre potencia y mcd.",
+            hints: "Practica: operaciones avanzadas, Ord a =>, currificacion, map.",
+            relevance: "ALTA - insertOrd/ordenada y currificacion con map aparecen en examenes.",
+            solution: {
+              hint: "La currificacion permite aplicar parcialmente funciones: si potencia :: Int -> Int -> Int, entonces (potencia 2) :: Int -> Int es una funcion que eleva 2 a la potencia dada. map aplica una funcion a cada elemento de una lista.",
+              stepByStep: "6. sacar: Saca el elemento en posicion n. Caso base con lista vacia retorna []. Si n=0, retorna la cola (salta la cabeza). Si n>0, conserva cabeza y busca en cola con n-1.\n7. eliminar: Elimina todas las ocurrencias de e. Si cabeza == e, no la incluye. Si cabeza /= e, la conserva.\n8. intersec: Si la cabeza de la primera lista es elem de la segunda, la incluye. Si no, la descarta.\n11. insertOrd: Inserta en lista ordenada. Si lista vacia, [e]. Si e <= cabeza, pone e antes. Si no, conserva cabeza y busca posicion en cola.\n12. ordenada: Ordena la cola, luego inserta cabeza con insertOrd.\n13-14. Currificacion: map (potencia 2) [1,2,3] aplica (potencia 2) a cada elemento, o sea [2^1, 2^2, 2^3] = [2,4,8].",
+              fullCode: "-- 6. sacar elemento en posicion n\nsacar :: Int -> [a] -> [a]\nsacar _ [] = []\nsacar 0 (_:xs) = xs\nsacar n (x:xs) = x : sacar (n-1) xs\n\n-- 7. eliminar todas las ocurrencias\neliminar :: Eq a => a -> [a] -> [a]\neliminar _ [] = []\neliminar e (x:xs)\n  | e == x    = eliminar e xs\n  | otherwise = x : eliminar e xs\n\n-- 8. interseccion de dos listas\nintersec :: Eq a => [a] -> [a] -> [a]\nintersec [] _ = []\nintersec (x:xs) ys\n  | elem x ys = x : intersec xs ys\n  | otherwise = intersec xs ys\n\n-- 11. insertar en lista ordenada\ninsertOrd :: Ord a => a -> [a] -> [a]\ninsertOrd e [] = [e]\ninsertOrd e (x:xs)\n  | e <= x    = e : x : xs\n  | otherwise = x : insertOrd e xs\n\n-- 12. ordenamiento por insercion\nordenada :: Ord a => [a] -> [a]\nordenada [] = []\nordenada (x:xs) = insertOrd x (ordenada xs)\n\n-- 13-14. Currificacion con map\n-- map (potencia 2) [1,2,3,4] => [2,4,8,16]\n-- Explicacion: (potencia 2) es aplicacion parcial,\n-- genera una funcion que calcula 2^n\n-- map (mcd 12) [4,6,8,9] => [4,6,4,3]"
+            }
           },
           {
-            number: '15-19',
-            title: 'Estructuras de Datos y Arboles',
-            description: '15. parejas :: [a]->[a]->[(a,a)]. 16. data Mov/Paseo. 17. aplica :: (Int->Int->Int)->[a]->[a]. 18. Circuito logico con tipos. 19. Arbol binario: cantidad, mostrar, profundidad.',
-            hints: 'Practica: data types, arboles (data Arbol = Nodo | Hoja), recursion sobre arboles.',
-            relevance: 'MUY ALTA - Definir data types y funciones sobre arboles aparece en examenes recientes (Jul 2025, Feb 2026).'
+            number: "15-19",
+            title: "Estructuras de Datos y Arboles",
+            description: "15. parejas :: [a]->[a]->[(a,a)]. 16. data Mov/Paseo. 17. aplica :: (Int->Int->Int)->[a]->[a]. 18. Circuito logico con tipos. 19. Arbol binario: cantidad, mostrar, profundidad.",
+            hints: "Practica: data types, arboles (data Arbol = Nodo | Hoja), recursion sobre arboles.",
+            relevance: "MUY ALTA - Definir data types y funciones sobre arboles aparece en examenes recientes (Jul 2025, Feb 2026).",
+            solution: {
+              hint: "Los arboles binarios en Haskell se definen con: data MiArbol a = Nodo a (MiArbol a) (MiArbol a) | Hoja. Cada funcion sobre el arbol tiene dos casos: Hoja (caso base) y Nodo (caso recursivo que procesa hijo izquierdo y derecho).",
+              stepByStep: "15. parejas: Caso base parejas [] [] = []. Recursivo: parejas (x:xs) (y:ys) = (x,y) : parejas xs ys. Combina cabezas en tupla.\n19. Arbol binario:\n- Define data MiArbol a = Nodo a (MiArbol a) (MiArbol a) | Hoja.\n- cantidadArbol: Hoja = 0. Nodo _ p q = 1 + cantidadArbol p + cantidadArbol q.\n- profundidad: Hoja = 0. Nodo _ p q = 1 + max (profundidad p) (profundidad q).\n- mostrarArbol: Hoja = []. Nodo x p q = [x] ++ mostrarArbol p ++ mostrarArbol q (recorrido preorden).",
+              fullCode: "-- 15. parejas - combinar dos listas en tuplas\nparejas :: [a] -> [a] -> [(a,a)]\nparejas [] [] = []\nparejas (x:xs) (y:ys) = (x,y) : parejas xs ys\n\n-- 19. Arbol binario\ndata MiArbol a = Nodo a (MiArbol a) (MiArbol a) | Hoja\n\ncantidadArbol :: MiArbol a -> Int\ncantidadArbol Hoja = 0\ncantidadArbol (Nodo _ p q) = 1 + cantidadArbol p + cantidadArbol q\n\nprofundidad :: MiArbol a -> Int\nprofundidad Hoja = 0\nprofundidad (Nodo _ p q) = 1 + max (profundidad p) (profundidad q)\n\nmostrarArbol :: MiArbol a -> [a]\nmostrarArbol Hoja = []\nmostrarArbol (Nodo x p q) = [x] ++ mostrarArbol p ++ mostrarArbol q\n\n-- Ejemplo de uso:\n-- arbol = Nodo 1 (Nodo 2 Hoja Hoja) (Nodo 3 Hoja Hoja)\n-- cantidadArbol arbol  => 3\n-- profundidad arbol    => 2\n-- mostrarArbol arbol   => [1,2,3]"
+            }
           }
         ]
       },
       {
-        id: 'tp-uml',
-        title: 'TP 6: UML a Codigo Java',
-        category: 'java',
+        id: "tp-uml",
+        title: "TP 6: UML a Codigo Java",
+        category: "java",
         exercises: [
           {
             number: 1,
-            title: 'Diagramas UML a Codigo',
-            description: 'Guia completa de traduccion de diagramas UML a codigo Java. Incluye: clases, atributos, metodos, relaciones (herencia, asociacion, composicion, agregacion), cardinalidades, packages.',
-            hints: 'Practica: leer diagramas UML y traducirlos a Java. Identificar tipo de relacion por la flecha.',
-            relevance: 'MUY ALTA - En examenes presenciales SIEMPRE hay un diagrama UML para completar/implementar.'
+            title: "Diagramas UML a Codigo",
+            description: "Guia completa de traduccion de diagramas UML a codigo Java. Incluye: clases, atributos, metodos, relaciones (herencia, asociacion, composicion, agregacion), cardinalidades, packages.",
+            hints: "Practica: leer diagramas UML y traducirlos a Java. Identificar tipo de relacion por la flecha.",
+            relevance: "MUY ALTA - En examenes presenciales SIEMPRE hay un diagrama UML para completar/implementar.",
+            solution: {
+              hint: "En UML: flecha con triangulo hueco = herencia (extends). Rombo negro = composicion (el objeto se crea dentro). Rombo blanco = agregacion (el objeto se recibe por parametro). Linea simple = asociacion.",
+              stepByStep: "1. Herencia: Flecha con triangulo hueco. En Java: class Hijo extends Padre. Si es interfaz: class Clase implements Interfaz.\n2. Composicion (rombo negro): El objeto 'parte' se crea DENTRO del constructor del 'todo'. Si el todo se destruye, la parte tambien.\n3. Agregacion (rombo blanco): El objeto 'parte' se recibe como parametro. Puede existir sin el 'todo'.\n4. Asociacion (linea simple): Una clase tiene referencia a otra. Se pasa por parametro o setter.\n5. Cardinalidades: 1 = un atributo simple. * o n = arreglo o ArrayList. 0..1 = puede ser null.\n6. Visibilidad: + = public, - = private, # = protected, ~ = package.",
+              fullCode: "// EJEMPLO: Diagrama UML traducido a Java\n// Universidad --<> Facultad (composicion)\n// Facultad ----> Profesor (asociacion)\n// Facultad <>-- Alumno (agregacion)\n// Alumno --|> Persona (herencia)\n\npublic abstract class Persona {\n    protected String nombre;\n    protected int dni;\n    public Persona(String n, int d) {\n        this.nombre = n;\n        this.dni = d;\n    }\n    public abstract String getRol();\n}\n\npublic class Alumno extends Persona {  // HERENCIA\n    private int legajo;\n    public Alumno(String n, int d, int l) {\n        super(n, d);\n        this.legajo = l;\n    }\n    public String getRol() { return \"Alumno\"; }\n}\n\npublic class Profesor {\n    private String nombre;\n    private String cargo;\n    public Profesor(String n, String c) {\n        this.nombre = n;\n        this.cargo = c;\n    }\n}\n\npublic class Facultad {\n    private String nombre;\n    private ArrayList<Alumno> alumnos;  // AGREGACION: recibidos\n    private Profesor decano;            // ASOCIACION: referencia\n\n    public Facultad(String nombre) {\n        this.nombre = nombre;\n        this.alumnos = new ArrayList<Alumno>();\n    }\n    public void agregarAlumno(Alumno a) { alumnos.add(a); }\n    public void setDecano(Profesor p) { this.decano = p; }\n}\n\npublic class Universidad {\n    private String nombre;\n    private Facultad[] facultades;  // COMPOSICION: se crean dentro\n\n    public Universidad(String nombre, int cantFac) {\n        this.nombre = nombre;\n        this.facultades = new Facultad[cantFac];\n        // Se crean internamente = COMPOSICION\n        for (int i = 0; i < cantFac; i++) {\n            facultades[i] = new Facultad(\"Facultad \" + (i+1));\n        }\n    }\n}"
+            }
           }
         ]
       },
       {
-        id: 'guia-funcional',
-        title: 'Guia de Estudio: Prog. Funcional',
-        category: 'haskell',
+        id: "guia-funcional",
+        title: "Guia de Estudio: Prog. Funcional",
+        category: "haskell",
         exercises: [
           {
             number: 1,
-            title: 'Teoria del Paradigma Funcional',
-            description: 'Guia completa de 34 paginas cubriendo: Calculo lambda, funciones orden superior, sistemas de inferencia de tipos, polimorfismo, pasaje por nombre, evaluacion perezosa, currificacion, listas, tuplas, arboles, data types.',
-            hints: 'Esta guia es la fuente principal de la catedra para Haskell. Los problemas modelo del apendice son muy similares a los de examenes finales.',
-            relevance: 'CRITICA - El apendice "Problemas modelo de examenes" contiene ejercicios identicos a los que aparecen en finales: concatenar con patrones, mostrar arboles, prototipos de funciones, listas por comprension.'
+            title: "Teoria del Paradigma Funcional",
+            description: "Guia completa de 34 paginas cubriendo: Calculo lambda, funciones orden superior, sistemas de inferencia de tipos, polimorfismo, pasaje por nombre, evaluacion perezosa, currificacion, listas, tuplas, arboles, data types.",
+            hints: "Esta guia es la fuente principal de la catedra para Haskell. Los problemas modelo del apendice son muy similares a los de examenes finales.",
+            relevance: "CRITICA - El apendice 'Problemas modelo de examenes' contiene ejercicios identicos a los que aparecen en finales: concatenar con patrones, mostrar arboles, prototipos de funciones, listas por comprension.",
+            solution: {
+              hint: "Los ejercicios del apendice son los mas importantes. Practica concatenar con patrones, escribir funciones sobre arboles, y determinar el tipo (prototipo) de funciones dadas.",
+              stepByStep: "1. Concatenar con patrones: concatenar [] ys = ys. concatenar (x:xs) ys = x : concatenar xs ys. Toma la cabeza de la primera lista y la agrega al resultado, recursivamente.\n2. Mostrar arbol: Recorre el arbol y genera una representacion. mostrarArb Hoja = []. mostrarArb (Nodo x i d) = mostrarArb i ++ [x] ++ mostrarArb d (inorden).\n3. Prototipos de funciones: Para determinar el tipo, analiza los parametros y el resultado. Si f recibe un Int y una lista y retorna Bool, su tipo es Int -> [a] -> Bool.\n4. Ejercicios de prototipo: g x y = x + y tiene tipo Num a => a -> a -> a. h x = [x] tiene tipo a -> [a]. t f x = f (f x) tiene tipo (a -> a) -> a -> a.",
+              fullCode: "-- PROBLEMA 1: concatenar con patrones\nconcatenar :: [a] -> [a] -> [a]\nconcatenar [] ys = ys\nconcatenar (x:xs) ys = x : concatenar xs ys\n\n-- PROBLEMA 2: mostrar arbol (recorrido inorden)\ndata Arbol a = Nodo a (Arbol a) (Arbol a) | Hoja\n\nmostrarInorden :: Arbol a -> [a]\nmostrarInorden Hoja = []\nmostrarInorden (Nodo x izq der) = mostrarInorden izq ++ [x] ++ mostrarInorden der\n\nmostrarPreorden :: Arbol a -> [a]\nmostrarPreorden Hoja = []\nmostrarPreorden (Nodo x izq der) = [x] ++ mostrarPreorden izq ++ mostrarPreorden der\n\n-- PROBLEMA 3: Prototipos de funciones\n-- g x y = x + y\n-- Tipo: Num a => a -> a -> a\n-- Razon: + requiere Num, ambos parametros y resultado son del mismo tipo\n\n-- h x = [x]\n-- Tipo: a -> [a]\n-- Razon: toma cualquier valor y lo pone en una lista\n\n-- t f x = f (f x)\n-- Tipo: (a -> a) -> a -> a\n-- Razon: f se aplica a x y luego al resultado, asi que f :: a -> a\n\n-- r x y = (x, length y)\n-- Tipo: a -> [b] -> (a, Int)\n-- Razon: x es cualquier tipo, y debe ser lista (por length), retorna tupla\n\n-- q f g x = f x + g x\n-- Tipo: Num a => (b -> a) -> (b -> a) -> b -> a\n-- Razon: f y g reciben x y retornan algo sumable (Num)"
+            }
           }
         ]
       }
@@ -4365,6 +4455,21 @@
       container.innerHTML = '<div style="animation: fadeIn 0.3s ease">' +
         '<h2>' + guide.title + '</h2>' +
         guide.exercises.map(function(ex) {
+          var solutionHtml = '';
+          if (ex.solution) {
+            solutionHtml = '<div class="dropdown-level" style="margin-top:0.5rem">' +
+              '<button class="dropdown-btn" onclick="toggleDropdown(this)" style="color:var(--secondary)">&#9658; Pista</button>' +
+              '<div class="dropdown-content" style="border-left-color:var(--secondary)">' + ex.solution.hint + '</div>' +
+            '</div>' +
+            '<div class="dropdown-level">' +
+              '<button class="dropdown-btn" onclick="toggleDropdown(this)" style="color:var(--accent)">&#9658; Paso a paso</button>' +
+              '<div class="dropdown-content" style="border-left-color:var(--accent);white-space:pre-line">' + ex.solution.stepByStep + '</div>' +
+            '</div>' +
+            '<div class="dropdown-level">' +
+              '<button class="dropdown-btn" onclick="toggleDropdown(this)" style="color:var(--success)">&#9658; Codigo completo</button>' +
+              '<div class="dropdown-content" style="border-left-color:var(--success)"><pre style="margin:0;overflow-x:auto;background:var(--bg);padding:1rem;border-radius:8px"><code>' + ex.solution.fullCode + '</code></pre></div>' +
+            '</div>';
+          }
           return '<div class="card" style="margin-bottom:1rem;border-left:3px solid ' + color + '">' +
             '<h3 style="margin-bottom:0.5rem">Ejercicio ' + ex.number + ': ' + ex.title + '</h3>' +
             '<p style="margin-bottom:1rem">' + ex.description + '</p>' +
@@ -4376,6 +4481,7 @@
               '<button class="dropdown-btn" onclick="toggleDropdown(this)">&#9658; Relevancia para el examen final</button>' +
               '<div class="dropdown-content" style="border-left-color:var(--warning)">' + ex.relevance + '</div>' +
             '</div>' +
+            solutionHtml +
           '</div>';
         }).join('') +
       '</div>';
