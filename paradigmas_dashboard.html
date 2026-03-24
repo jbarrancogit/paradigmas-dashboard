@@ -830,6 +830,7 @@
     <div class="nav-tab" data-tab="haskell">&#x03BB; Haskell</div>
     <div class="nav-tab" data-tab="examenes">&#x1F4DD; Examenes Predichos</div>
     <div class="nav-tab" data-tab="inteligencia">&#x1F9E0; Inteligencia Catedra</div>
+    <div class="nav-tab" data-tab="practicos">🔧 Ejercicios Practicos</div>
   </nav>
 
   <!-- Tab: Dashboard -->
@@ -908,6 +909,16 @@
     <div id="patterns-container" style="margin-top:1rem"></div>
     <h3 style="margin-top:2rem">Tips de Supervivencia</h3>
     <div id="tips-container" style="margin-top:1rem"></div>
+  </section>
+
+  <!-- Tab: Ejercicios Practicos -->
+  <section id="tab-practicos" class="tab-content">
+    <div class="theory-layout">
+      <div class="theory-sidebar" id="sidebar-practicos"></div>
+      <div class="theory-content" id="content-practicos">
+        <p class="fallback-msg">Selecciona una guia del menu lateral</p>
+      </div>
+    </div>
   </section>
 
   <script>
@@ -4145,6 +4156,232 @@
       `).join('');
     }
     renderTips();
+
+    // ===========================
+    // EJERCICIOS PRACTICOS
+    // ===========================
+
+    const PRACTICAL_EXERCISES = [
+      {
+        id: 'tp-objetos',
+        title: 'TP 1: Clases y Objetos (Java)',
+        category: 'java',
+        exercises: [
+          {
+            number: 1,
+            title: 'Clase Escritura',
+            description: 'Implementar la clase Escritura que modela la informacion de la escritura de una propiedad. Atributos: numero (Integer), superficie (int), domicilio (String). Implementar constructor de inicializacion y de copia. Verificar diferencias entre public, private y constantes. Implementar get()/set() y metodo mostrar().',
+            hints: 'Practica: constructores, encapsulamiento, modificadores de acceso, constructor de copia.',
+            relevance: 'ALTA - Los constructores y encapsulamiento aparecen en el 100% de los examenes finales.'
+          },
+          {
+            number: 2,
+            title: 'Clase Lote',
+            description: 'Implementar la clase Lote con: idPadron (Integer, constante), domicilio (String), avaluoxmt (float), superficie (int, constante). Variables publicas deben ser constantes. Metodos: get()/set(), constructor con parametros, metodo auxiliar privado (avaluoxmt * superficie), valuar() que usa el metodo auxiliar, mostrar().',
+            hints: 'Practica: constantes (final), metodos privados auxiliares, relacion entre metodos.',
+            relevance: 'ALTA - El uso de final y metodos privados es frecuente en preguntas V/F.'
+          }
+        ]
+      },
+      {
+        id: 'tp-relaciones',
+        title: 'TP 2: Relaciones (Java)',
+        category: 'java',
+        exercises: [
+          {
+            number: 1,
+            title: 'Modelo Registro-Lote-Edificio',
+            description: 'Implementar modelo con: Edificio (abstracta), Registro-Lote usando arreglo para cardinalidad n, inicializador static para variable de clase. Metodos: emitirBoletos(), valuar(), registrar(). Relacion entre Registro y Lote con arreglo simple.',
+            hints: 'Practica: clases abstractas, relaciones de asociacion, variables de clase (static), arreglos.',
+            relevance: 'ALTA - Diagramas UML similares aparecen en examenes presenciales. La relacion herencia+composicion+agregacion es clasica.'
+          },
+          {
+            number: 2,
+            title: 'Extensiones: Casa, PH, Departamento',
+            description: 'Agregar clases Casa, PH, Departamento en nuevo package. PH-Departamento con ArrayList parametrizado. Implementar ErrorLote (excepcion personalizada). Persistencia con Serializable.',
+            hints: 'Practica: packages, ArrayList parametrizado, excepciones personalizadas (extends Exception), Serializable.',
+            relevance: 'MUY ALTA - ArrayList parametrizado y excepciones aparecen en examenes virtuales 2025-2026.'
+          }
+        ]
+      },
+      {
+        id: 'tp-aplicaciones',
+        title: 'TP 3: Aplicaciones (Java)',
+        category: 'java',
+        exercises: [
+          {
+            number: 1,
+            title: 'Modelo Persona-Estudiante-Profesor-Curso',
+            description: 'Implementar en dos packages (Miembros y Asignaturas). Metodos: inscribir, inscriptos, dicta. Curso hereda de HashTable. ErrorInscripcion si alumno se inscribe en mas de 3 cursos. Parametrizar Curso para solo aceptar Inscripcion.',
+            hints: 'Practica: packages, herencia de contenedores, excepciones, generics, interfaces.',
+            relevance: 'MUY ALTA - Combina herencia + excepciones + generics, los 3 temas mas evaluados.'
+          },
+          {
+            number: 2,
+            title: 'Modelo Vehiculo-Fabrica-Componentes',
+            description: 'Packages: Principal (Main, Fabrica), Componentes (Rueda=agregacion, Motor=asociacion, Chasis=composicion), Vehiculos (interfaces Vehiculo y Producto, clases Auto y Camion). Fabrica.crear() sobrecargado.',
+            hints: 'Practica: composicion vs agregacion vs asociacion, interfaces, sobrecarga, packages.',
+            relevance: 'MUY ALTA - La distincion composicion/agregacion/asociacion es pregunta clasica de examen.'
+          }
+        ]
+      },
+      {
+        id: 'tp-prolog',
+        title: 'TP 4: Prolog',
+        category: 'prolog',
+        exercises: [
+          {
+            number: '1-4',
+            title: 'Hechos y Reglas Basicas',
+            description: '1. par(N) sin usar mod. 2. suma(N,S) sumatoria primeros N pares. 3. potencia(B,E,V). 4. fibonacci(N,R).',
+            hints: 'Practica: recursion basica, caso base + caso recursivo, aritmetica con is.',
+            relevance: 'MEDIA - Estos ejercicios basicos rara vez aparecen en finales, pero son la base para entender los demas.'
+          },
+          {
+            number: '5-6',
+            title: 'Circuito Logico y Diagnostico',
+            description: '5. Definir and/or/not y circuito(Q1,Q2,S). 6. Definir sintoma(P,S), enfermedad(E,S) y diagnostico(P,S,E).',
+            hints: 'Practica: hechos como base de datos, reglas con multiples condiciones.',
+            relevance: 'MEDIA - El concepto de base de datos Prolog aparece en preguntas conceptuales.'
+          },
+          {
+            number: '7-12',
+            title: 'Tratamiento de Listas (Basico)',
+            description: '7. predecesor(L,R) elementos >= predecesor. 8. rotada(L,N,P) rotacion izquierda. 9. suma(S,L). 10. cantidad(L,N). 11. ultimo(L,U). 12. inversa(L,I).',
+            hints: 'Practica: recursion sobre listas, cabeza|cola, append, caso base lista vacia.',
+            relevance: 'MUY ALTA - Escribir predicados sobre listas aparece en TODOS los examenes finales.'
+          },
+          {
+            number: '13-20',
+            title: 'Tratamiento de Listas (Avanzado)',
+            description: '13. sacar(P,L,R) sin elemento en posicion P. 14. eliminar(L,E,R) una ocurrencia. 15. eliminar todas. 16. interseccion(L1,L2,L3). 17. rotarIzq(L,N,R). 18. insertarEn(E,L,P,R). 19. insOrden(E,O,D). 20. ordenada(L,O) usando insOrden.',
+            hints: 'Practica: operaciones avanzadas de listas, corte (!), not/miembro.',
+            relevance: 'ALTA - insOrden y ordenada aparecen como ejercicios de examen. Tambien interseccion.'
+          },
+          {
+            number: '21-24',
+            title: 'Estructuras de Datos',
+            description: '21. Arbol con functor persona(nombre,dni,edad): mostrar descendientes y ascendientes. 22. parejas(L1,L2,L3). 23. Base de datos persona(nombre,telefono,sexo,edad). 24. Grafo de ciudades: camino, distancia.',
+            hints: 'Practica: functores, arboles, grafos, busqueda en profundidad.',
+            relevance: 'MEDIA-ALTA - Los functores y arboles aparecen en preguntas conceptuales y en arboles de resolucion.'
+          }
+        ]
+      },
+      {
+        id: 'tp-haskell',
+        title: 'TP 5: Haskell',
+        category: 'haskell',
+        exercises: [
+          {
+            number: '1-4',
+            title: 'Definiciones Funcionales (Patrones)',
+            description: '1. potencia :: Int->Int->Int. 2. valAbsoluto :: Int->Int. 3. sumatoria :: Int->Int. 4. divisor :: Int->Int->Bool (restas sucesivas, sin mod).',
+            hints: 'Practica: pattern matching, recursion, caso base.',
+            relevance: 'ALTA - Las definiciones con patrones son la base de todas las preguntas de Haskell en examenes.'
+          },
+          {
+            number: '5-8',
+            title: 'Guardas y Lambda',
+            description: '5. divisor con guardas. 6. mcd :: Int->Int->Int (algoritmo de restos). 7. Lambda Int->Int->Int mayor. 8. Lambda Int->Bool par.',
+            hints: 'Practica: guardas (|), otherwise, expresiones lambda (\\x -> ...).',
+            relevance: 'MUY ALTA - Las guardas y lambda aparecen en todos los examenes. Evaluar expresiones lambda es pregunta clasica.'
+          },
+          {
+            number: '1-5 (Listas)',
+            title: 'Tratamiento de Listas',
+            description: '1. Analizar q1 (genera sublistas). 2. suma polimcrfica. 3. cantidad. 4. ultimo con guardas y patrones. 5. inversa.',
+            hints: 'Practica: listas, head/tail, recursion, polimorfismo.',
+            relevance: 'MUY ALTA - Funciones recursivas sobre listas son el ejercicio mas comun en finales de Haskell.'
+          },
+          {
+            number: '6-12 (Listas)',
+            title: 'Listas Avanzadas + Currificacion',
+            description: '6. sacar. 7. eliminar. 8. intersec. 9. rotarIzq. 10. insertarEn. 11. insertOrd. 12. ordenada. 13-14. Currificacion con map sobre potencia y mcd.',
+            hints: 'Practica: operaciones avanzadas, Ord a =>, currificacion, map.',
+            relevance: 'ALTA - insertOrd/ordenada y currificacion con map aparecen en examenes.'
+          },
+          {
+            number: '15-19',
+            title: 'Estructuras de Datos y Arboles',
+            description: '15. parejas :: [a]->[a]->[(a,a)]. 16. data Mov/Paseo. 17. aplica :: (Int->Int->Int)->[a]->[a]. 18. Circuito logico con tipos. 19. Arbol binario: cantidad, mostrar, profundidad.',
+            hints: 'Practica: data types, arboles (data Arbol = Nodo | Hoja), recursion sobre arboles.',
+            relevance: 'MUY ALTA - Definir data types y funciones sobre arboles aparece en examenes recientes (Jul 2025, Feb 2026).'
+          }
+        ]
+      },
+      {
+        id: 'tp-uml',
+        title: 'TP 6: UML a Codigo Java',
+        category: 'java',
+        exercises: [
+          {
+            number: 1,
+            title: 'Diagramas UML a Codigo',
+            description: 'Guia completa de traduccion de diagramas UML a codigo Java. Incluye: clases, atributos, metodos, relaciones (herencia, asociacion, composicion, agregacion), cardinalidades, packages.',
+            hints: 'Practica: leer diagramas UML y traducirlos a Java. Identificar tipo de relacion por la flecha.',
+            relevance: 'MUY ALTA - En examenes presenciales SIEMPRE hay un diagrama UML para completar/implementar.'
+          }
+        ]
+      },
+      {
+        id: 'guia-funcional',
+        title: 'Guia de Estudio: Prog. Funcional',
+        category: 'haskell',
+        exercises: [
+          {
+            number: 1,
+            title: 'Teoria del Paradigma Funcional',
+            description: 'Guia completa de 34 paginas cubriendo: Calculo lambda, funciones orden superior, sistemas de inferencia de tipos, polimorfismo, pasaje por nombre, evaluacion perezosa, currificacion, listas, tuplas, arboles, data types.',
+            hints: 'Esta guia es la fuente principal de la catedra para Haskell. Los problemas modelo del apendice son muy similares a los de examenes finales.',
+            relevance: 'CRITICA - El apendice "Problemas modelo de examenes" contiene ejercicios identicos a los que aparecen en finales: concatenar con patrones, mostrar arboles, prototipos de funciones, listas por comprension.'
+          }
+        ]
+      }
+    ];
+
+    function initPracticos() {
+      var sidebar = document.getElementById('sidebar-practicos');
+      sidebar.innerHTML = PRACTICAL_EXERCISES.map(function(guide, i) {
+        var colorMap = { java: 'var(--java)', prolog: 'var(--prolog)', haskell: 'var(--haskell)' };
+        var color = colorMap[guide.category] || 'var(--text)';
+        return '<div class="sidebar-item ' + (i === 0 ? 'active' : '') + '" data-guide-id="' + guide.id + '" onclick="selectGuide(\'' + guide.id + '\')" style="border-left:3px solid ' + color + '">' + guide.title + '</div>';
+      }).join('');
+      if (PRACTICAL_EXERCISES.length > 0) renderGuide(PRACTICAL_EXERCISES[0]);
+    }
+
+    function selectGuide(guideId) {
+      document.querySelectorAll('#sidebar-practicos .sidebar-item').forEach(function(item) {
+        item.classList.toggle('active', item.dataset.guideId === guideId);
+      });
+      var guide = PRACTICAL_EXERCISES.find(function(g) { return g.id === guideId; });
+      if (guide) renderGuide(guide);
+    }
+
+    function renderGuide(guide) {
+      var container = document.getElementById('content-practicos');
+      var colorMap = { java: 'var(--java)', prolog: 'var(--prolog)', haskell: 'var(--haskell)' };
+      var color = colorMap[guide.category] || 'var(--text)';
+
+      container.innerHTML = '<div style="animation: fadeIn 0.3s ease">' +
+        '<h2>' + guide.title + '</h2>' +
+        guide.exercises.map(function(ex) {
+          return '<div class="card" style="margin-bottom:1rem;border-left:3px solid ' + color + '">' +
+            '<h3 style="margin-bottom:0.5rem">Ejercicio ' + ex.number + ': ' + ex.title + '</h3>' +
+            '<p style="margin-bottom:1rem">' + ex.description + '</p>' +
+            '<div class="dropdown-level">' +
+              '<button class="dropdown-btn" onclick="toggleDropdown(this)">&#9658; Que practicas con este ejercicio</button>' +
+              '<div class="dropdown-content" style="border-left-color:' + color + '">' + ex.hints + '</div>' +
+            '</div>' +
+            '<div class="dropdown-level">' +
+              '<button class="dropdown-btn" onclick="toggleDropdown(this)">&#9658; Relevancia para el examen final</button>' +
+              '<div class="dropdown-content" style="border-left-color:var(--warning)">' + ex.relevance + '</div>' +
+            '</div>' +
+          '</div>';
+        }).join('') +
+      '</div>';
+    }
+
+    initPracticos();
 
     // ===========================
     // 3D RESOLUTION TREES - Task 9
