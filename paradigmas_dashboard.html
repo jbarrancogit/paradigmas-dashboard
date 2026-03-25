@@ -2056,7 +2056,12 @@
       // Find topic in all arrays
       const allTopics = [...JAVA_TOPICS, ...PROLOG_TOPICS, ...HASKELL_TOPICS];
       const topic = allTopics.find(t => t.id === topicId);
-      if (topic) renderTopicContent(topic, contentId);
+      if (topic) {
+        renderTopicContent(topic, contentId);
+        var el = document.getElementById(contentId);
+        el.scrollTop = 0;
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
     }
 
     function renderTopicContent(topic, contentId) {
@@ -4677,7 +4682,9 @@
       var guide = PRACTICAL_EXERCISES.find(function(g) { return g.id === guideId; });
       if (guide) {
         renderGuide(guide);
-        document.getElementById('content-practicos').scrollTop = 0;
+        var el = document.getElementById('content-practicos');
+        el.scrollTop = 0;
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
     }
 
