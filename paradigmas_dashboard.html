@@ -4678,6 +4678,13 @@
       if (guide) renderGuide(guide);
     }
 
+    function formatCode(code) {
+      if (!code) return '';
+      var d = document.createElement('div');
+      d.textContent = code.replace(/\\n/g, '\n').replace(/\\"/g, '"').replace(/\\t/g, '  ');
+      return d.innerHTML;
+    }
+
     function renderGuide(guide) {
       var container = document.getElementById('content-practicos');
       var colorMap = { java: 'var(--java)', prolog: 'var(--prolog)', haskell: 'var(--haskell)' };
@@ -4687,16 +4694,16 @@
       var solutionHtml = '';
       if (guide.solution) {
         solutionHtml = '<div class="dropdown-level" style="margin-top:0.5rem">' +
-          '<button class="dropdown-btn" onclick="toggleDropdown(this)" style="color:var(--secondary)">&#9658; Pista</button>' +
-          '<div class="dropdown-content" style="border-left-color:var(--secondary)">' + guide.solution.hint + '</div>' +
+          '<button class="dropdown-btn" onclick="toggleDropdown(this)" style="color:var(--haskell)">&#9658; Pista</button>' +
+          '<div class="dropdown-content" style="border-left-color:var(--haskell)">' + guide.solution.hint + '</div>' +
         '</div>' +
         '<div class="dropdown-level">' +
-          '<button class="dropdown-btn" onclick="toggleDropdown(this)" style="color:var(--accent)">&#9658; Paso a paso</button>' +
-          '<div class="dropdown-content" style="border-left-color:var(--accent);white-space:pre-line">' + guide.solution.stepByStep + '</div>' +
+          '<button class="dropdown-btn" onclick="toggleDropdown(this)" style="color:var(--warning)">&#9658; Paso a paso</button>' +
+          '<div class="dropdown-content" style="border-left-color:var(--warning);white-space:pre-line">' + guide.solution.stepByStep.replace(/\\n/g, '\n') + '</div>' +
         '</div>' +
         '<div class="dropdown-level">' +
           '<button class="dropdown-btn" onclick="toggleDropdown(this)" style="color:var(--success)">&#9658; Codigo completo</button>' +
-          '<div class="dropdown-content" style="border-left-color:var(--success)"><pre style="margin:0;overflow-x:auto;background:var(--bg);padding:1rem;border-radius:8px"><code>' + guide.solution.fullCode + '</code></pre></div>' +
+          '<div class="dropdown-content" style="border-left-color:var(--success)"><pre style="margin:0;overflow-x:auto;background:#0d1117;padding:1rem;border-radius:8px;font-size:0.85rem;line-height:1.5"><code style="color:#e6edf3;font-family:Consolas,monospace">' + formatCode(guide.solution.fullCode) + '</code></pre></div>' +
         '</div>';
       }
       container.innerHTML = '<div style="animation: fadeIn 0.3s ease">' +
