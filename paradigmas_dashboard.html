@@ -4675,7 +4675,10 @@
         item.classList.toggle('active', item.dataset.guideId === guideId);
       });
       var guide = PRACTICAL_EXERCISES.find(function(g) { return g.id === guideId; });
-      if (guide) renderGuide(guide);
+      if (guide) {
+        renderGuide(guide);
+        document.getElementById('content-practicos').scrollTop = 0;
+      }
     }
 
     function formatCode(code) {
