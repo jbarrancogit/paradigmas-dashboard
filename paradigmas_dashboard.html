@@ -831,6 +831,7 @@
     <div class="nav-tab" data-tab="examenes">&#x1F4DD; Examenes Predichos</div>
     <div class="nav-tab" data-tab="inteligencia">&#x1F9E0; Inteligencia Catedra</div>
     <div class="nav-tab" data-tab="practicos">🔧 Ejercicios Practicos</div>
+    <div onclick="toggleSearch()" style="padding:1rem;cursor:pointer;color:var(--text-dim);font-size:0.85rem;display:flex;align-items:center;gap:0.5rem">🔍 <span style="background:var(--surface-2);padding:2px 6px;border-radius:4px;font-size:0.7rem">Ctrl+K</span></div>
   </nav>
 
   <!-- Tab: Dashboard -->
@@ -920,6 +921,62 @@
       </div>
     </div>
   </section>
+
+  <!-- Exam Simulator Overlay -->
+  <div id="simulator-overlay" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:var(--bg);z-index:1000;overflow-y:auto">
+    <div style="max-width:900px;margin:0 auto;padding:2rem">
+      <div id="sim-header" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2rem">
+        <h2>Simulacro de Examen Final</h2>
+        <div style="display:flex;gap:1rem;align-items:center">
+          <div id="sim-timer" style="font-size:1.5rem;font-weight:700;color:var(--warning);font-family:monospace"></div>
+          <button onclick="endSimulator()" style="background:var(--danger);color:white;border:none;padding:0.5rem 1rem;border-radius:8px;cursor:pointer">Terminar</button>
+        </div>
+      </div>
+      <div id="sim-config" style="text-align:center;padding:3rem">
+        <h3 style="margin-bottom:1.5rem">Configurar Simulacro</h3>
+        <div style="margin-bottom:1rem">
+          <label style="color:var(--text-dim)">Cantidad de preguntas:</label>
+          <select id="sim-count" style="background:var(--surface);color:white;border:1px solid rgba(255,255,255,0.1);padding:0.5rem;border-radius:4px;margin-left:0.5rem">
+            <option value="10">10 (rapido)</option>
+            <option value="20" selected>20 (estandar)</option>
+            <option value="30">30 (examen completo)</option>
+          </select>
+        </div>
+        <div style="margin-bottom:1rem">
+          <label style="color:var(--text-dim)">Tiempo:</label>
+          <select id="sim-time" style="background:var(--surface);color:white;border:1px solid rgba(255,255,255,0.1);padding:0.5rem;border-radius:4px;margin-left:0.5rem">
+            <option value="15">15 min</option>
+            <option value="30" selected>30 min</option>
+            <option value="50">50 min (real)</option>
+            <option value="0">Sin limite</option>
+          </select>
+        </div>
+        <button onclick="startSimulator()" style="background:var(--success);color:white;border:none;padding:0.75rem 2rem;border-radius:8px;cursor:pointer;font-size:1.1rem;font-weight:600;margin-top:1rem">Comenzar Simulacro</button>
+      </div>
+      <div id="sim-questions" style="display:none"></div>
+      <div id="sim-results" style="display:none"></div>
+    </div>
+  </div>
+
+  <!-- Search Overlay -->
+  <div id="search-overlay" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:2000;justify-content:center;padding-top:10vh">
+    <div style="width:100%;max-width:600px;padding:0 1rem">
+      <div style="background:var(--surface);border-radius:12px;border:1px solid rgba(255,255,255,0.1);overflow:hidden">
+        <div style="display:flex;align-items:center;padding:1rem;border-bottom:1px solid rgba(255,255,255,0.05)">
+          <span style="color:var(--text-dim);margin-right:0.75rem">🔍</span>
+          <input id="search-input" type="text" placeholder="Buscar en teoria, ejercicios, examenes..." oninput="doSearch(this.value)" style="flex:1;background:none;border:none;color:white;font-size:1rem;outline:none" autocomplete="off">
+          <span style="color:var(--text-dim);font-size:0.75rem;background:var(--surface-2);padding:2px 8px;border-radius:4px">ESC</span>
+        </div>
+        <div id="search-results" style="max-height:60vh;overflow-y:auto;padding:0.5rem"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Floating Simulator Button -->
+  <div style="position:fixed;bottom:2rem;right:2rem;display:flex;flex-direction:column;gap:0.75rem;z-index:999">
+    <button onclick="showFlashcardModal()" style="width:50px;height:50px;border-radius:50%;background:var(--prolog);color:white;border:none;font-size:1.2rem;cursor:pointer;box-shadow:0 4px 15px rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center" title="Flashcards">🃏</button>
+    <button onclick="document.getElementById('simulator-overlay').style.display='block'" style="width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,var(--java),var(--haskell));color:white;border:none;font-size:1.5rem;cursor:pointer;box-shadow:0 4px 15px rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center" title="Simulacro de Examen">📝</button>
+  </div>
 
   <script>
     // ===========================
@@ -2292,6 +2349,7 @@
         var el = document.getElementById(contentId);
         el.scrollTop = 0;
         el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        if (typeof markTopicStudied === 'function') markTopicStudied(topicId);
       }
     }
 
@@ -4916,6 +4974,7 @@
         var el = document.getElementById('content-practicos');
         el.scrollTop = 0;
         el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        if (typeof markExerciseDone === 'function') markExerciseDone(guideId);
       }
     }
 
@@ -5207,6 +5266,236 @@
     }, 200);
 
     // ===========================
+    // EXAM SIMULATOR
+    // ===========================
+    var simTimer = null, simAnswers = {}, simQuestions = [], simTimeLeft = 0;
+
+    function getAllVFQuestions() {
+      var all = [];
+      PREDICTED_EXAMS.forEach(function(exam) {
+        exam.questions.forEach(function(q) { if (q.type === 'vf') all.push(q); });
+      });
+      return all;
+    }
+
+    function shuffleArray(arr) {
+      var a = arr.slice();
+      for (var i = a.length - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1));
+        var temp = a[i]; a[i] = a[j]; a[j] = temp;
+      }
+      return a;
+    }
+
+    function startSimulator() {
+      var count = parseInt(document.getElementById('sim-count').value);
+      var minutes = parseInt(document.getElementById('sim-time').value);
+      simQuestions = shuffleArray(getAllVFQuestions()).slice(0, count);
+      simAnswers = {};
+      document.getElementById('sim-config').style.display = 'none';
+      document.getElementById('sim-questions').style.display = 'block';
+      document.getElementById('sim-results').style.display = 'none';
+      var html = '';
+      simQuestions.forEach(function(q, i) {
+        var pColor = q.paradigm === 'java' ? 'var(--java)' : q.paradigm === 'prolog' ? 'var(--prolog)' : 'var(--haskell)';
+        html += '<div class="card" style="margin-bottom:1rem"><div style="display:flex;justify-content:space-between;margin-bottom:0.5rem"><span style="color:var(--text-dim)">Pregunta ' + (i+1) + '/' + simQuestions.length + '</span><span class="tag" style="background:' + pColor + ';color:white">' + q.paradigm.toUpperCase() + '</span></div><p style="font-weight:500;margin-bottom:1rem">' + q.question + '</p><div style="display:flex;gap:1rem"><button onclick="simAnswer(' + i + ',true)" id="sim-btn-' + i + '-v" style="flex:1;padding:0.75rem;border:2px solid rgba(255,255,255,0.1);background:var(--surface);color:white;border-radius:8px;cursor:pointer;font-weight:600">VERDADERO</button><button onclick="simAnswer(' + i + ',false)" id="sim-btn-' + i + '-f" style="flex:1;padding:0.75rem;border:2px solid rgba(255,255,255,0.1);background:var(--surface);color:white;border-radius:8px;cursor:pointer;font-weight:600">FALSO</button></div></div>';
+      });
+      html += '<div style="text-align:center;margin-top:2rem"><button onclick="endSimulator()" style="background:var(--success);color:white;border:none;padding:0.75rem 2rem;border-radius:8px;cursor:pointer;font-size:1.1rem">Entregar Examen</button></div>';
+      document.getElementById('sim-questions').innerHTML = html;
+      if (minutes > 0) {
+        simTimeLeft = minutes * 60;
+        updateSimTimer();
+        simTimer = setInterval(function() { simTimeLeft--; updateSimTimer(); if (simTimeLeft <= 0) { clearInterval(simTimer); endSimulator(); } }, 1000);
+      } else { document.getElementById('sim-timer').textContent = 'Sin limite'; }
+    }
+
+    function updateSimTimer() {
+      var m = Math.floor(simTimeLeft / 60), s = simTimeLeft % 60;
+      var el = document.getElementById('sim-timer');
+      el.textContent = (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
+      el.style.color = simTimeLeft < 60 ? 'var(--danger)' : simTimeLeft < 300 ? 'var(--warning)' : 'var(--success)';
+    }
+
+    function simAnswer(idx, val) {
+      simAnswers[idx] = val;
+      document.getElementById('sim-btn-' + idx + '-v').style.borderColor = val ? 'var(--success)' : 'rgba(255,255,255,0.1)';
+      document.getElementById('sim-btn-' + idx + '-v').style.background = val ? 'rgba(34,197,94,0.2)' : 'var(--surface)';
+      document.getElementById('sim-btn-' + idx + '-f').style.borderColor = !val ? 'var(--danger)' : 'rgba(255,255,255,0.1)';
+      document.getElementById('sim-btn-' + idx + '-f').style.background = !val ? 'rgba(239,68,68,0.2)' : 'var(--surface)';
+    }
+
+    function endSimulator() {
+      if (simTimer) clearInterval(simTimer);
+      var correct = 0, total = simQuestions.length, details = [];
+      simQuestions.forEach(function(q, i) {
+        var isCorrect = simAnswers[i] === q.correctAnswer;
+        if (isCorrect) correct++;
+        details.push({ question: q.question, userAnswer: simAnswers[i], correctAnswer: q.correctAnswer, isCorrect: isCorrect, paradigm: q.paradigm, explanation: q.fullAnswer });
+      });
+      var score = Math.round((correct / total) * 100), passed = score >= 60;
+      saveSimResult(score, total, correct);
+      document.getElementById('sim-questions').style.display = 'none';
+      document.getElementById('sim-results').style.display = 'block';
+      var html = '<div style="text-align:center;padding:2rem"><div style="font-size:4rem;font-weight:700;color:' + (passed ? 'var(--success)' : 'var(--danger)') + '">' + score + '%</div><p style="font-size:1.25rem;margin:0.5rem 0">' + (passed ? 'APROBADO' : 'DESAPROBADO') + '</p><p style="color:var(--text-dim)">' + correct + ' correctas de ' + total + '</p></div><h3 style="margin:2rem 0 1rem">Revision de respuestas</h3>';
+      details.forEach(function(d, i) {
+        var pColor = d.paradigm === 'java' ? 'var(--java)' : d.paradigm === 'prolog' ? 'var(--prolog)' : 'var(--haskell)';
+        html += '<div class="card" style="margin-bottom:0.75rem;border-left:3px solid ' + (d.isCorrect ? 'var(--success)' : 'var(--danger)') + '"><div style="display:flex;justify-content:space-between;margin-bottom:0.5rem"><span>' + (d.isCorrect ? '✅' : '❌') + ' P' + (i+1) + '</span><span class="tag" style="background:' + pColor + ';color:white">' + d.paradigm.toUpperCase() + '</span></div><p style="margin-bottom:0.5rem">' + d.question + '</p><p style="font-size:0.85rem;color:var(--text-dim)">Tu: ' + (d.userAnswer === undefined ? 'Sin responder' : d.userAnswer ? 'V' : 'F') + ' | Correcta: ' + (d.correctAnswer ? 'V' : 'F') + '</p><div class="dropdown-level" style="margin-top:0.5rem"><button class="dropdown-btn" onclick="toggleDropdown(this)">▶ Explicacion</button><div class="dropdown-content">' + (d.explanation || '') + '</div></div></div>';
+      });
+      html += '<div style="text-align:center;margin-top:2rem"><button onclick="resetSimulator()" style="background:var(--haskell);color:white;border:none;padding:0.75rem 2rem;border-radius:8px;cursor:pointer">Nuevo Simulacro</button> <button onclick="closeSimulator()" style="background:var(--surface);color:white;border:1px solid rgba(255,255,255,0.1);padding:0.75rem 2rem;border-radius:8px;cursor:pointer;margin-left:1rem">Cerrar</button></div>';
+      document.getElementById('sim-results').innerHTML = html;
+    }
+
+    function resetSimulator() {
+      document.getElementById('sim-config').style.display = 'block';
+      document.getElementById('sim-questions').style.display = 'none';
+      document.getElementById('sim-results').style.display = 'none';
+      document.getElementById('sim-timer').textContent = '';
+    }
+
+    function closeSimulator() {
+      document.getElementById('simulator-overlay').style.display = 'none';
+      resetSimulator();
+    }
+
+    // ===========================
+    // GLOBAL SEARCH (Ctrl+K)
+    // ===========================
+    document.addEventListener('keydown', function(e) {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'k') { e.preventDefault(); toggleSearch(); }
+      if (e.key === 'Escape') { document.getElementById('search-overlay').style.display = 'none'; }
+    });
+
+    function toggleSearch() {
+      var overlay = document.getElementById('search-overlay');
+      if (overlay.style.display === 'flex') { overlay.style.display = 'none'; }
+      else { overlay.style.display = 'flex'; document.getElementById('search-input').value = ''; document.getElementById('search-input').focus(); document.getElementById('search-results').innerHTML = '<p style="text-align:center;color:var(--text-dim);padding:2rem">Escribi para buscar en todo el dashboard</p>'; }
+    }
+
+    function doSearch(query) {
+      if (query.length < 2) { document.getElementById('search-results').innerHTML = '<p style="text-align:center;color:var(--text-dim);padding:2rem">Escribi al menos 2 caracteres</p>'; return; }
+      var q = query.toLowerCase(), results = [];
+      [].concat(JAVA_TOPICS, PROLOG_TOPICS, HASKELL_TOPICS).forEach(function(t) {
+        if ((t.title + ' ' + t.concept + ' ' + t.trap).toLowerCase().indexOf(q) !== -1) {
+          results.push({ type: 'Teoria', title: t.title, paradigm: t.id.split('-')[0], action: "switchTab('" + t.id.split('-')[0] + "')" });
+        }
+      });
+      PRACTICAL_EXERCISES.forEach(function(ex) {
+        if ((ex.title + ' ' + ex.description).toLowerCase().indexOf(q) !== -1) {
+          results.push({ type: 'Ejercicio', title: ex.title, paradigm: ex.category, action: "switchTab('practicos');selectGuide('" + ex.id + "')" });
+        }
+      });
+      PREDICTED_EXAMS.forEach(function(exam) {
+        exam.questions.forEach(function(qn) {
+          if ((qn.question + ' ' + (qn.fullAnswer || '')).toLowerCase().indexOf(q) !== -1) {
+            results.push({ type: 'Examen #' + exam.id, title: qn.question.substring(0, 80) + '...', paradigm: qn.paradigm, action: "switchTab('examenes');renderExam(" + exam.id + ")" });
+          }
+        });
+      });
+      var container = document.getElementById('search-results');
+      if (results.length === 0) { container.innerHTML = '<p style="text-align:center;color:var(--text-dim);padding:2rem">Sin resultados para "' + query + '"</p>'; return; }
+      container.innerHTML = results.slice(0, 20).map(function(r) {
+        var pColor = r.paradigm === 'java' ? 'var(--java)' : r.paradigm === 'prolog' ? 'var(--prolog)' : 'var(--haskell)';
+        return '<div onclick="' + r.action + ';document.getElementById(\'search-overlay\').style.display=\'none\'" style="padding:0.75rem 1rem;cursor:pointer;display:flex;align-items:center;gap:0.75rem;border-radius:8px;margin:0.25rem" onmouseover="this.style.background=\'var(--surface-2)\'" onmouseout="this.style.background=\'none\'"><span class="tag" style="background:' + pColor + ';color:white;min-width:60px;text-align:center">' + r.paradigm.toUpperCase() + '</span><div><p style="font-size:0.8rem;color:var(--text-dim)">' + r.type + '</p><p style="font-size:0.9rem">' + r.title + '</p></div></div>';
+      }).join('') + (results.length > 20 ? '<p style="text-align:center;color:var(--text-dim);padding:0.5rem">... y ' + (results.length - 20) + ' mas</p>' : '');
+    }
+
+    // ===========================
+    // PROGRESS TRACKING (LocalStorage)
+    // ===========================
+    function getProgress() { try { return JSON.parse(localStorage.getItem('pp-progress') || '{}'); } catch(e) { return {}; } }
+    function saveProgress(key, value) { var p = getProgress(); p[key] = value; p.lastUpdated = new Date().toISOString(); localStorage.setItem('pp-progress', JSON.stringify(p)); }
+    function saveSimResult(score, total, correct) { var p = getProgress(); if (!p.sims) p.sims = []; p.sims.push({ date: new Date().toISOString(), score: score }); localStorage.setItem('pp-progress', JSON.stringify(p)); }
+    function markTopicStudied(id) { saveProgress('t-' + id, true); }
+    function markExerciseDone(id) { saveProgress('e-' + id, true); }
+
+    // ===========================
+
+    // ===========================
+    // TIER 2: FLASHCARDS
+    // ===========================
+    var flashcards = [], fcIndex = 0, fcFlipped = false;
+
+    function initFlashcards() {
+      flashcards = [];
+      [].concat(JAVA_TOPICS, PROLOG_TOPICS, HASKELL_TOPICS).forEach(function(t) {
+        flashcards.push({ front: t.examQuestion.question, back: t.examQuestion.answer, paradigm: t.id.split('-')[0] });
+      });
+      PREDICTED_EXAMS.forEach(function(exam) {
+        exam.questions.forEach(function(q) {
+          if (q.type === 'vf') flashcards.push({ front: q.question, back: (q.correctAnswer ? 'VERDADERO' : 'FALSO') + '. ' + (q.fullAnswer || ''), paradigm: q.paradigm });
+        });
+      });
+      flashcards = shuffleArray(flashcards);
+    }
+
+    function showFlashcardModal() {
+      if (flashcards.length === 0) initFlashcards();
+      fcIndex = 0; fcFlipped = false;
+      var overlay = document.createElement('div');
+      overlay.id = 'fc-overlay';
+      overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);z-index:3000;display:flex;align-items:center;justify-content:center;flex-direction:column';
+      overlay.innerHTML = '<div style="text-align:center;margin-bottom:1rem"><span id="fc-counter" style="color:#888">1/' + flashcards.length + '</span></div><div id="fc-card" onclick="flipCard()" style="width:90%;max-width:600px;min-height:250px;background:#1a1a2e;border-radius:16px;padding:2rem;cursor:pointer;display:flex;align-items:center;justify-content:center;text-align:center;font-size:1.1rem;border:2px solid rgba(255,255,255,0.1);transition:transform 0.3s"><p id="fc-text"></p></div><div style="display:flex;gap:1rem;margin-top:1.5rem"><button onclick="fcPrev()" style="background:#1a1a2e;color:white;border:1px solid rgba(255,255,255,0.1);padding:0.5rem 1.5rem;border-radius:8px;cursor:pointer">Anterior</button><button onclick="fcNext()" style="background:#8b5cf6;color:white;border:none;padding:0.5rem 1.5rem;border-radius:8px;cursor:pointer">Siguiente</button><button onclick="document.getElementById(\'fc-overlay\').remove()" style="background:#ef4444;color:white;border:none;padding:0.5rem 1.5rem;border-radius:8px;cursor:pointer">Cerrar</button></div><p style="color:#888;font-size:0.8rem;margin-top:1rem">Click en la tarjeta para voltear</p>';
+      document.body.appendChild(overlay);
+      renderFlashcard();
+    }
+
+    function renderFlashcard() {
+      var fc = flashcards[fcIndex];
+      document.getElementById('fc-text').innerHTML = fcFlipped ? fc.back : fc.front;
+      document.getElementById('fc-card').style.borderColor = fcFlipped ? '#22c55e' : 'rgba(255,255,255,0.1)';
+      document.getElementById('fc-counter').textContent = (fcIndex + 1) + '/' + flashcards.length + ' | ' + fc.paradigm.toUpperCase();
+    }
+
+    function flipCard() { fcFlipped = !fcFlipped; renderFlashcard(); }
+    function fcNext() { fcIndex = (fcIndex + 1) % flashcards.length; fcFlipped = false; renderFlashcard(); }
+    function fcPrev() { fcIndex = (fcIndex - 1 + flashcards.length) % flashcards.length; fcFlipped = false; renderFlashcard(); }
+
+    // ===========================
+    // TIER 2: CATEDRA VIDEOS
+    // ===========================
+    var CATEDRA_VIDEOS = {
+      java: [
+        { title: 'OO - Clase 1', url: 'https://www.youtube.com/watch?v=y7eyMeEZswg' },
+        { title: 'OO - Clase 2', url: 'https://www.youtube.com/watch?v=IsA0cTvrY3Q' },
+        { title: 'OO - Clase 3', url: 'https://www.youtube.com/watch?v=6CNMAq1UZ7c' },
+        { title: 'OO - Clase 4', url: 'https://www.youtube.com/watch?v=ztpYmmecfQs' },
+        { title: 'OO - Clase 5', url: 'https://www.youtube.com/watch?v=sdJgcMaazmI' },
+        { title: 'OO - Clase 6', url: 'https://www.youtube.com/watch?v=gmceMV8CqSs' },
+        { title: 'OO - Clase 7', url: 'https://www.youtube.com/watch?v=LDZUBY0mxv8' },
+        { title: 'OO - Clase 8', url: 'https://www.youtube.com/watch?v=JXv-M05sqzs' },
+        { title: 'OO - Clase 9', url: 'https://www.youtube.com/watch?v=8xF_BSpSATw' }
+      ],
+      prolog: [
+        { title: 'Logico - Clase 1', url: 'https://drive.google.com/file/d/1NaqZf-T8MZH8uqlAcuO4mp2aotzj9twe/view' },
+        { title: 'Logico - Clase 2', url: 'https://drive.google.com/file/d/1xIrU_ERR2ETlEUHBeOIgGdUs0Qr3KaH1/view' },
+        { title: 'Logico - Clase 3', url: 'https://drive.google.com/file/d/18ZCN9IzcGKSEQhXYcVObrmOT4Y0-fsDM/view' },
+        { title: 'Logico - Clase 4', url: 'https://drive.google.com/file/d/1Rqc_qN3mde-FQr6SX_40lJUB9jk24p5U/view' },
+        { title: 'Logico - Clase 5', url: 'https://drive.google.com/file/d/1SqemjRtDY5NhHZzcnBfAPWmMA8WvmYMA/view' },
+        { title: 'Logico - Clase 6', url: 'https://drive.google.com/file/d/1plLkbM9RB5m8rfL-VivoGh-SPV1fOnSP/view' },
+        { title: 'Logico - Clase 7', url: 'https://drive.google.com/file/d/1KxlhmiKIPcgMXv9epYFrdnVvdBM2o7se/view' }
+      ],
+      haskell: [
+        { title: 'Funcional - Clase 1', url: 'https://drive.google.com/file/d/1F0sGYnLGVxLEZRwPktfD-t2bu6J_3foL/view' },
+        { title: 'Funcional - Clase 2', url: 'https://drive.google.com/file/d/1rGRBr9YOBLmZjZ3c1O8GhfaXXw_rhxm6/view' },
+        { title: 'Funcional - Clase 3', url: 'https://drive.google.com/file/d/1NOPgHq1lt5v2JUkOuYqfl85bEavbXBID/view' },
+        { title: 'Funcional - Clase 4', url: 'https://drive.google.com/file/d/1VO-zPk7djNwAcR-Cjxr7WdDM7ZTopPlI/view' },
+        { title: 'Funcional - Clase 5', url: 'https://drive.google.com/file/d/1GGVT9cpto8octZkypTYLg4M8XUQCWmNT/view' },
+        { title: 'Funcional - Clase 6', url: 'https://drive.google.com/file/d/14yig3XcHElstpgn5rbeB9WehhM882Ao7/view' },
+        { title: 'Funcional - Clase 7', url: 'https://drive.google.com/file/d/1wZDHbjUGurLXyvUND0uQse_6o3ePDKKb/view' }
+      ]
+    };
+
+    // ===========================
+    // TIER 3: RANDOM EXAM GENERATOR
+    // ===========================
+    function generateRandomExam() {
+      var allQ = [];
+      PREDICTED_EXAMS.forEach(function(exam) { exam.questions.forEach(function(q) { allQ.push(q); }); });
+      var shuffled = shuffleArray(allQ);
+      var exam = { id: 99, probability: 0, title: 'Examen Aleatorio Generado', description: 'Generado automaticamente combinando preguntas de todos los examenes predichos. Cada vez es diferente.', questions: shuffled.slice(0, 28) };
+      return exam;
+    }
+
     // TASK 10: FINAL POLISH
     // ===========================
 
