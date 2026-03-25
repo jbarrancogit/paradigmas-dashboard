@@ -954,6 +954,8 @@
           </select>
         </div>
         <button onclick="startSimulator()" style="background:var(--success);color:white;border:none;padding:0.75rem 2rem;border-radius:8px;cursor:pointer;font-size:1.1rem;font-weight:600;margin-top:1rem">Comenzar Simulacro</button>
+        <p style="margin-top:1.5rem;color:var(--text-dim);font-size:0.85rem">O genera un examen unico cada vez:</p>
+        <button onclick="startRandomExam()" style="background:var(--haskell);color:white;border:none;padding:0.5rem 1.5rem;border-radius:8px;cursor:pointer;margin-top:0.5rem">Examen Aleatorio Infinito</button>
       </div>
       <div id="sim-questions" style="display:none"></div>
       <div id="sim-results" style="display:none"></div>
@@ -5381,6 +5383,26 @@
     function closeSimulator() {
       document.getElementById('simulator-overlay').style.display = 'none';
       resetSimulator();
+    }
+
+    function startRandomExam() {
+      var allQ = [];
+      PREDICTED_EXAMS.forEach(function(exam) { exam.questions.forEach(function(q) { if (q.type === 'vf') allQ.push(q); }); });
+      simQuestions = shuffleArray(allQ).slice(0, 30);
+      simAnswers = {};
+      document.getElementById('sim-config').style.display = 'none';
+      document.getElementById('sim-questions').style.display = 'block';
+      document.getElementById('sim-results').style.display = 'none';
+      var html = '<div class="card" style="margin-bottom:1.5rem;border-left:3px solid var(--haskell)"><h3>Examen Aleatorio</h3><p style="color:var(--text-dim)">30 preguntas seleccionadas al azar. Cada vez que lo generes sera diferente.</p></div>';
+      simQuestions.forEach(function(q, i) {
+        var pColor = q.paradigm === 'java' ? 'var(--java)' : q.paradigm === 'prolog' ? 'var(--prolog)' : 'var(--haskell)';
+        html += '<div class="card" style="margin-bottom:1rem"><div style="display:flex;justify-content:space-between;margin-bottom:0.5rem"><span style="color:var(--text-dim)">P' + (i+1) + '/' + simQuestions.length + '</span><span class="tag" style="background:' + pColor + ';color:white">' + q.paradigm.toUpperCase() + '</span></div><p style="font-weight:500;margin-bottom:1rem">' + q.question + '</p><div style="display:flex;gap:1rem"><button onclick="simAnswer(' + i + ',true)" id="sim-btn-' + i + '-v" style="flex:1;padding:0.75rem;border:2px solid rgba(255,255,255,0.1);background:var(--surface);color:white;border-radius:8px;cursor:pointer;font-weight:600">VERDADERO</button><button onclick="simAnswer(' + i + ',false)" id="sim-btn-' + i + '-f" style="flex:1;padding:0.75rem;border:2px solid rgba(255,255,255,0.1);background:var(--surface);color:white;border-radius:8px;cursor:pointer;font-weight:600">FALSO</button></div></div>';
+      });
+      html += '<div style="text-align:center;margin-top:2rem"><button onclick="endSimulator()" style="background:var(--success);color:white;border:none;padding:0.75rem 2rem;border-radius:8px;cursor:pointer;font-size:1.1rem">Entregar</button></div>';
+      document.getElementById('sim-questions').innerHTML = html;
+      simTimeLeft = 50 * 60;
+      updateSimTimer();
+      simTimer = setInterval(function() { simTimeLeft--; updateSimTimer(); if (simTimeLeft <= 0) { clearInterval(simTimer); endSimulator(); } }, 1000);
     }
 
     // ===========================
