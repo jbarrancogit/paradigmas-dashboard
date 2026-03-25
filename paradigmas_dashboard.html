@@ -811,13 +811,13 @@
     <div id="hero-3d"></div>
     <div class="header-overlay">
       <h1>PARADIGMAS DE PROGRAMACION</h1>
-      <p class="subtitle">Dashboard Maestro de Estudio</p>
+      <p class="subtitle">Dashboard Maestro de Estudio - UTN FRM</p>
       <div class="stats-bar">
-        <span class="stat">&#x26A0; 2 CHANCES</span>
+        <span class="stat">☕ Java OO</span>
         <span class="stat-divider">|</span>
-        <span class="stat">&#x1F3AF; META: JUL 1, 2026</span>
+        <span class="stat">🔍 Prolog</span>
         <span class="stat-divider">|</span>
-        <span class="stat">&#x1F4C5; ~6 SEMANAS</span>
+        <span class="stat">λ Haskell</span>
       </div>
     </div>
     <div id="hero-tooltip" style="position:absolute;display:none;background:rgba(0,0,0,0.8);color:white;padding:4px 12px;border-radius:4px;font-size:0.8rem;pointer-events:none;z-index:20;"></div>
@@ -1171,27 +1171,8 @@
     // ===========================
     // COUNTDOWN TIMER
     // ===========================
-    function initCountdown() {
-      var target = new Date('2026-07-01');
-      var container = document.getElementById('countdown-container');
-
-      function update() {
-        var now = new Date();
-        var diff = target - now;
-        var days = Math.ceil(diff / (1000 * 60 * 60 * 24));
-
-        if (days > 0) {
-          container.innerHTML = '<div class="countdown"><p style="color:var(--text-dim);margin-bottom:0.5rem">PROXIMA MESA DE EXAMEN</p><div class="countdown-number">' + days + '</div><p>dias para la 3ra Mesa (Jul 1, 2026)</p></div>';
-        } else if (days === 0) {
-          container.innerHTML = '<div class="countdown"><div class="countdown-number" style="color:var(--warning)">HOY</div><p>Dia de examen!</p></div>';
-        } else {
-          container.innerHTML = '<div class="countdown"><div class="countdown-number" style="color:var(--text-dim)">---</div><p>Mesa pasada</p></div>';
-        }
-      }
-      update();
-      setInterval(update, 3600000);
-    }
-    initCountdown();
+    // Countdown removed - generic version
+    document.getElementById('countdown-container').innerHTML = '<div class="countdown"><div class="countdown-number" style="font-size:2rem">Paradigmas de Programacion</div><p style="color:var(--text-dim)">UTN - Facultad Regional Mendoza | Ing. en Sistemas de Informacion</p></div>';
 
     // ===========================
     // CHART.JS CHARTS
