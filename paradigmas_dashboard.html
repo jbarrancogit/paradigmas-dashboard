@@ -846,6 +846,8 @@
     <div class="grid-3" id="quick-cards"></div>
     <h3 style="margin-top:2rem;margin-bottom:1rem">Semaforo de Urgencia</h3>
     <div class="traffic-light" id="traffic-light"></div>
+    <h3 style="margin-top:2rem;margin-bottom:1rem">Videos de la Catedra</h3>
+    <div id="videos-container" class="grid-3"></div>
   </section>
 
   <!-- Tab: Java OO -->
@@ -1427,6 +1429,30 @@
       }).join('');
     }
     initTrafficLight();
+
+    // Videos renderer (uses CATEDRA_VIDEOS defined later, so defer)
+    setTimeout(function() {
+      if (typeof CATEDRA_VIDEOS === 'undefined') return;
+      var container = document.getElementById('videos-container');
+      if (!container) return;
+      var html = '';
+      var sections = [
+        { key: 'java', label: 'Java OO', color: 'var(--java)', icon: '☕' },
+        { key: 'prolog', label: 'Prolog', color: 'var(--prolog)', icon: '🔍' },
+        { key: 'haskell', label: 'Haskell', color: 'var(--haskell)', icon: 'λ' }
+      ];
+      sections.forEach(function(sec) {
+        var videos = CATEDRA_VIDEOS[sec.key] || [];
+        html += '<div class="card" style="border-left:3px solid ' + sec.color + '">' +
+          '<h4 style="margin-bottom:0.75rem">' + sec.icon + ' ' + sec.label + ' (' + videos.length + ' videos)</h4>' +
+          '<ul style="list-style:none;padding:0">';
+        videos.forEach(function(v) {
+          html += '<li style="padding:0.3rem 0"><a href="' + v.url + '" target="_blank" rel="noopener" style="color:' + sec.color + ';text-decoration:none;font-size:0.9rem">' + v.title + ' ↗</a></li>';
+        });
+        html += '</ul></div>';
+      });
+      container.innerHTML = html;
+    }, 500);
 
     // ===========================
     // THEORY CONTENT DATA
