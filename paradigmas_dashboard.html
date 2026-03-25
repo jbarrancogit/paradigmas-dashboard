@@ -1663,6 +1663,98 @@
           reasoning: 'Las variables static (de clase) pertenecen a la CLASE, no a las instancias. Su ciclo de vida esta ligado al de la clase misma, no al de sus instancias. Aunque se destruyan todas las instancias, la clase sigue cargada en la JVM y sus variables static siguen existiendo.',
           answer: 'FALSO. Las variables de clase (static) NO se destruyen cuando se destruyen las instancias. Persisten mientras la clase este cargada en la JVM. Su ciclo de vida es independiente del de las instancias.'
         }
+      },
+      {
+        id: 'java-13',
+        title: 'Threads: Thread, Runnable, start(), synchronized',
+        critical: true,
+        concept: `<p><strong>Thread</strong> (hilo) es una unidad de ejecucion ligera dentro de un proceso. Java ofrece dos formas de crear hilos: (1) <strong>extender la clase Thread</strong> y sobrescribir <code>run()</code>, (2) <strong>implementar la interface Runnable</strong> y pasar la instancia al constructor de Thread. La segunda forma es preferible porque Java no admite herencia multiple de clases, y con Runnable la clase puede extender otra clase (Schildt, "Java 7", Cap. 11).</p>
+<p><code>start()</code> crea un nuevo hilo del sistema operativo y llama a <code>run()</code> internamente en ese nuevo hilo. Invocar <code>run()</code> directamente <strong>NO crea un hilo nuevo</strong>: ejecuta el metodo en el hilo actual, como cualquier llamada normal.</p>
+<p>La palabra clave <code>synchronized</code> garantiza <strong>exclusion mutua</strong>: solo un hilo puede ejecutar un bloque o metodo synchronized a la vez sobre el mismo objeto monitor. Esto previene condiciones de carrera (race conditions) cuando multiples hilos acceden a datos compartidos.</p>
+<p>Un Thread tiene estados: <strong>New</strong> (creado), <strong>Runnable</strong> (listo para ejecutar), <strong>Running</strong> (ejecutando), <strong>Blocked</strong> (esperando un lock o I/O), <strong>Dead</strong> (finalizado). <code>Thread.sleep(ms)</code> pausa el hilo actual y lanza <code>InterruptedException</code> (checked exception, debe ir en try-catch). <code>join()</code> espera a que termine otro hilo. <code>wait()</code>/<code>notify()</code> permiten comunicacion entre hilos.</p>`,
+        realWorld: `Spotify usa threads: uno reproduce musica, otro descarga la siguiente cancion, otro actualiza la interfaz grafica. Sin threads, tendrias que esperar a que termine cada tarea antes de empezar la siguiente.`,
+        example: {
+          code: `// Forma 1: Extender Thread\nclass MiHilo extends Thread {\n    public void run() {\n        System.out.println("Hilo: " + getName());\n    }\n}\n\n// Forma 2: Implementar Runnable (PREFERIBLE)\nclass MiTarea implements Runnable {\n    public void run() {\n        System.out.println("Tarea ejecutando");\n    }\n}\n\n// Contador con synchronized\nclass Contador {\n    private int cuenta = 0;\n    public synchronized void incrementar() {\n        cuenta++;  // exclusion mutua garantizada\n    }\n    public synchronized int getCuenta() { return cuenta; }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        // Usando Thread\n        MiHilo t1 = new MiHilo();\n        t1.start();  // CORRECTO: crea nuevo hilo\n        // t1.run();  // MAL: NO crea hilo, ejecuta en main\n\n        // Usando Runnable\n        Thread t2 = new Thread(new MiTarea());\n        t2.start();\n\n        // Synchronized con Contador compartido\n        Contador c = new Contador();\n        Thread h1 = new Thread(() -> {\n            for(int i=0; i<1000; i++) c.incrementar();\n        });\n        Thread h2 = new Thread(() -> {\n            for(int i=0; i<1000; i++) c.incrementar();\n        });\n        h1.start();\n        h2.start();\n        try {\n            h1.join();  // espera a que termine h1\n            h2.join();  // espera a que termine h2\n        } catch(InterruptedException e) { }\n        System.out.println(c.getCuenta()); // 2000 (siempre)\n    }\n}`,
+          language: 'java',
+          explanation: `Se muestran las dos formas de crear hilos. start() crea un hilo nuevo; run() no. El Contador usa synchronized para garantizar que incrementar() sea atomica. join() espera la finalizacion. Con synchronized, el resultado siempre es 2000.`
+        },
+        trap: `TRAMPA CLASICA DE EXAMEN: Si el codigo usa <code>t1.start()</code> y <code>t2.start()</code> con <code>synchronized</code>, el programa <strong>NO tiene error</strong>. start() es correcto. Si te dicen que hay que cambiar start() por run(), es <strong>FALSO</strong> — run() NO crea un nuevo hilo. Tambien: <code>Thread.sleep()</code> lanza <code>InterruptedException</code> (checked), debe ir en try-catch.`,
+        examQuestion: {
+          question: 'Dado el siguiente programa con una clase Contador que tiene un metodo synchronized incrementar() y dos threads que invocan start(), indicar si el programa tiene errores.',
+          type: 'code',
+          hint: 'start() crea un nuevo hilo y llama a run() internamente. synchronized garantiza exclusion mutua. Es un programa valido?',
+          reasoning: 'El programa usa start() correctamente (crea hilos nuevos), synchronized garantiza exclusion mutua en incrementar(), y la estructura es valida. No hay errores. Si se cambiara start() por run(), NO se crearian hilos nuevos y ejecutaria secuencialmente en el hilo main.',
+          answer: 'El programa NO tiene errores. start() crea correctamente nuevos hilos que ejecutan run(). synchronized en incrementar() garantiza exclusion mutua. El resultado final sera consistente (2000 si cada hilo incrementa 1000 veces).'
+        }
+      },
+      {
+        id: 'java-14',
+        title: 'Persistencia: Serializable, ObjectOutputStream',
+        critical: false,
+        concept: `<p><strong>Serializable</strong> es una <strong>interface marker</strong> (no tiene metodos) del paquete <code>java.io</code>. Implementarla permite convertir objetos a una secuencia de bytes para guardarlos en archivo o enviarlos por red (Schildt, "Java 7", Cap. 13).</p>
+<p><code>ObjectOutputStream.writeObject(obj)</code> serializa un objeto (lo convierte a bytes y lo escribe en un stream). <code>ObjectInputStream.readObject()</code> deserializa (lee bytes y reconstruye el objeto). El metodo <code>readObject()</code> retorna <code>Object</code>, por lo que se requiere un cast explicito al tipo original.</p>
+<p>Los atributos marcados como <code>transient</code> <strong>no se serializan</strong>: se ignoran durante la escritura y se inicializan con valores por defecto al deserializar (null para objetos, 0 para numeros, false para boolean). Se usa para datos sensibles (passwords) o no serializables.</p>
+<p>El campo <code>serialVersionUID</code> identifica la version de la clase serializada. Si la clase cambia y el UID no coincide, la deserializacion lanza <code>InvalidClassException</code>. Todos los atributos de la clase deben ser Serializable tambien, o estar marcados como transient; de lo contrario, se lanza <code>NotSerializableException</code> en runtime.</p>`,
+        realWorld: `Cuando cerras un juego y al abrirlo retomas donde dejaste, la partida se serializo a disco. Tambien cuando guardas un documento en Google Docs offline, se serializa el estado para sincronizarlo luego.`,
+        example: {
+          code: `import java.io.*;\n\npublic class Escritura implements Serializable {\n    private static final long serialVersionUID = 1L;\n    private String titulo;\n    private String contenido;\n    private transient String passwordTemp; // NO se serializa\n\n    public Escritura(String titulo, String contenido) {\n        this.titulo = titulo;\n        this.contenido = contenido;\n    }\n\n    // Guardar objeto en archivo\n    public void guardar(String archivo) {\n        try (ObjectOutputStream oos = new ObjectOutputStream(\n                new FileOutputStream(archivo))) {\n            oos.writeObject(this);\n            System.out.println("Objeto guardado exitosamente");\n        } catch (IOException e) {\n            e.printStackTrace();\n        }\n    }\n\n    // Recuperar objeto de archivo\n    public static Escritura recuperar(String archivo) {\n        try (ObjectInputStream ois = new ObjectInputStream(\n                new FileInputStream(archivo))) {\n            return (Escritura) ois.readObject(); // cast necesario\n        } catch (IOException | ClassNotFoundException e) {\n            e.printStackTrace();\n            return null;\n        }\n    }\n\n    public String toString() {\n        return titulo + ": " + contenido;\n    }\n}\n\n// Uso:\nEscritura e = new Escritura("Mi texto", "Contenido...");\ne.guardar("datos.ser");\nEscritura e2 = Escritura.recuperar("datos.ser");\nSystem.out.println(e2); // Mi texto: Contenido...`,
+          language: 'java',
+          explanation: `Escritura implementa Serializable. guardar() usa ObjectOutputStream con try-with-resources para serializar. recuperar() usa ObjectInputStream y hace cast a Escritura. passwordTemp es transient, no se guarda. serialVersionUID controla la compatibilidad de versiones.`
+        },
+        trap: `OJO: Para serializar, la clase <strong>DEBE implementar Serializable</strong>. Si un atributo no es serializable y no es transient, lanza <code>NotSerializableException</code> en <strong>RUNTIME</strong> (no en compilacion). Y <code>readObject()</code> retorna Object, siempre necesita cast.`,
+        examQuestion: {
+          question: 'Implementar en la clase Escritura la persistencia de objetos utilizando la interface Serializable, con metodos para guardar y recuperar.',
+          type: 'code',
+          hint: 'La clase debe implementar Serializable. Usa ObjectOutputStream.writeObject() para guardar y ObjectInputStream.readObject() para recuperar. No olvides el cast.',
+          reasoning: 'Se necesita: (1) implements Serializable, (2) metodo guardar con ObjectOutputStream y writeObject, (3) metodo recuperar con ObjectInputStream y readObject con cast, (4) manejo de excepciones IOException y ClassNotFoundException.',
+          answer: 'La clase debe: implements Serializable, metodo guardar() que crea ObjectOutputStream(new FileOutputStream(archivo)) y llama writeObject(this), metodo recuperar() que crea ObjectInputStream(new FileInputStream(archivo)) y retorna (Escritura) ois.readObject(). Ambos con try-catch.'
+        }
+      },
+      {
+        id: 'java-15',
+        title: 'Clase Object, System, toString(), equals()',
+        critical: false,
+        concept: `<p><strong>Object</strong> es la raiz de toda la jerarquia de clases en Java. Toda clase hereda de Object directa o indirectamente, incluso si no se declara explicitamente <code>extends Object</code> (Schildt, "Java 7", Cap. 7).</p>
+<p>Metodos heredados de Object: <code>toString()</code> retorna una representacion String del objeto (por defecto, el nombre de la clase + @ + hashCode en hexadecimal); <code>equals(Object obj)</code> compara logicamente dos objetos (por defecto compara <strong>referencias</strong>, igual que ==); <code>hashCode()</code> retorna un codigo hash entero para uso en colecciones hash; <code>getClass()</code> retorna el objeto <code>Class</code> que representa la clase del objeto en runtime.</p>
+<p><code>System.out</code> es un <code>PrintStream</code> estatico para salida estandar. <code>System.out.println(obj)</code> llama automaticamente a <code>obj.toString()</code>. <code>System.gc()</code> <strong>sugiere</strong> al Garbage Collector que ejecute (no lo garantiza). <code>getClass().getName()</code> devuelve el nombre completo (con paquete) de la clase del objeto.</p>
+<p>Se recomienda hacer <strong>override</strong> de <code>toString()</code> y <code>equals()</code> en clases propias para dar comportamiento significativo. Al sobreescribir equals(), se debe sobreescribir tambien hashCode() para mantener el contrato: si <code>a.equals(b)</code>, entonces <code>a.hashCode() == b.hashCode()</code>.</p>`,
+        realWorld: `Cuando haces System.out.println(objeto), Java llama automaticamente a toString(). Si no lo sobreescribiste, muestra algo como "Persona@1a2b3c" (la direccion de memoria), que no es util para el usuario.`,
+        example: {
+          code: `public class Producto {\n    private String nombre;\n    private double precio;\n\n    public Producto(String nombre, double precio) {\n        this.nombre = nombre;\n        this.precio = precio;\n    }\n\n    // Override toString: representacion legible\n    @Override\n    public String toString() {\n        return nombre + " ($" + precio + ")";\n    }\n\n    // Override equals: comparar por contenido\n    @Override\n    public boolean equals(Object obj) {\n        if (this == obj) return true;  // misma referencia\n        if (obj == null || getClass() != obj.getClass()) return false;\n        Producto otro = (Producto) obj;\n        return nombre.equals(otro.nombre) && precio == otro.precio;\n    }\n\n    @Override\n    public int hashCode() {\n        return nombre.hashCode() + (int) precio;\n    }\n}\n\n// Uso:\nProducto p1 = new Producto("Laptop", 999.99);\nProducto p2 = new Producto("Laptop", 999.99);\n\nSystem.out.println(p1);          // Laptop ($999.99) - usa toString()\nSystem.out.println(p1 == p2);    // false (distintas referencias)\nSystem.out.println(p1.equals(p2)); // true (mismo contenido)\nSystem.out.println(p1.getClass().getName()); // Producto`,
+          language: 'java',
+          explanation: `toString() devuelve una representacion legible en vez de la direccion de memoria. equals() compara por contenido (nombre y precio) en vez de por referencia. getClass().getName() retorna el nombre de la clase en runtime.`
+        },
+        trap: `OJO: <code>objeto.getClass().getName()</code> permite saber el nombre de la clase del objeto. Esto es <strong>VERDADERO</strong>. Y <code>equals()</code> por defecto compara <strong>REFERENCIAS</strong> (==), no contenido. Para comparar contenido hay que hacer override.`,
+        examQuestion: {
+          question: 'La sentencia objeto.getClass().getName() permite obtener y saber cual es el nombre de la clase de la cual es instancia el objeto.',
+          type: 'vf',
+          hint: 'getClass() retorna el objeto Class y getName() retorna el nombre de esa clase. Es valido?',
+          reasoning: 'getClass() es un metodo heredado de Object que retorna el objeto Class representando la clase del objeto en runtime. getName() sobre ese Class retorna el nombre completo de la clase (incluyendo paquete). Es una forma valida y estandar de conocer la clase de un objeto en tiempo de ejecucion.',
+          answer: 'VERDADERO. getClass() retorna el objeto Class y getName() retorna el nombre de la clase. Es un mecanismo de reflexion valido para conocer la clase de un objeto en runtime.'
+        }
+      },
+      {
+        id: 'java-16',
+        title: 'Caracteristicas de Java, JVM, Paradigma OO',
+        critical: false,
+        concept: `<p>Java es un lenguaje <strong>compilado + interpretado</strong>: el codigo fuente (.java) se compila a <strong>bytecode</strong> (.class) mediante <code>javac</code>, y luego la <strong>JVM</strong> (Java Virtual Machine) interpreta/ejecuta ese bytecode. Esto le da <strong>portabilidad multiplataforma</strong>: "Write Once, Run Anywhere" (Schildt, "Java 7", Cap. 1).</p>
+<p>Java <strong>NO es orientado a objetos puro</strong> porque tiene <strong>tipos primitivos</strong> (int, float, double, char, boolean, byte, short, long) que no son objetos. Los <strong>wrappers</strong> (Integer, Float, Double, Character, Boolean) envuelven primitivos como objetos. <strong>Autoboxing</strong> es la conversion automatica entre primitivo y wrapper: <code>Integer x = 5;</code> (boxing), <code>int y = x;</code> (unboxing).</p>
+<p>Los <strong>pilares de la POO</strong> son: <strong>Herencia</strong> (reutilizacion de codigo, extends), <strong>Polimorfismo</strong> (mismo mensaje, distinto comportamiento), <strong>Encapsulamiento</strong> (ocultar datos, modificadores de acceso), y <strong>Abstraccion</strong> (modelar solo lo esencial). La <strong>Integridad Referencial NO es un pilar de POO</strong> (es un concepto de bases de datos relacionales).</p>
+<p>En memoria: los <strong>objetos</strong> se almacenan en el <strong>Heap</strong> y las <strong>referencias</strong> (variables que apuntan a objetos) en el <strong>Stack</strong>. El <strong>Garbage Collector</strong> libera automaticamente la memoria de objetos sin referencias activas.</p>`,
+        realWorld: `Java corre igual en Windows, Mac y Linux gracias a la JVM. Por eso Android lo eligio como lenguaje principal. Y el autoboxing te permite usar int e Integer casi indistintamente, como cuando guardas numeros en un ArrayList<Integer>.`,
+        example: {
+          code: `// Tipos primitivos vs objetos (wrappers)\nint primitivo = 42;           // Stack\nInteger objeto = 42;          // Autoboxing: int -> Integer (Heap)\nint devuelta = objeto;        // Unboxing: Integer -> int\n\n// Primitivos en Stack, objetos en Heap\nint a = 10;                   // 10 directamente en Stack\nString s = "Hola";            // referencia en Stack, objeto en Heap\n\n// Los pilares de POO en accion:\n// HERENCIA\nclass Animal {\n    void hablar() { System.out.println("..."); }\n}\nclass Perro extends Animal {  // hereda de Animal\n    // POLIMORFISMO\n    @Override\n    void hablar() { System.out.println("Guau!"); }\n}\n\n// ENCAPSULAMIENTO\nclass CuentaBanco {\n    private double saldo;     // dato oculto\n    public double getSaldo() { return saldo; } // acceso controlado\n}\n\n// ABSTRACCION\nabstract class Forma {\n    abstract double area();   // solo lo esencial\n}\n\n// JVM y portabilidad\n// Archivo.java -> javac -> Archivo.class (bytecode)\n// Archivo.class -> JVM Windows / JVM Linux / JVM Mac`,
+          language: 'java',
+          explanation: `Se muestran los tipos primitivos en Stack vs objetos en Heap, autoboxing/unboxing, y los 4 pilares de POO. Java compila a bytecode que la JVM ejecuta en cualquier plataforma. Integridad Referencial NO es pilar de POO.`
+        },
+        trap: `TRAMPA: "Herencia, Polimorfismo, Encapsulamiento, Abstraccion e <strong>Integridad Referencial</strong> son pilares de POO" -> <strong>FALSO</strong>. Integridad Referencial NO es pilar de POO, es un concepto de bases de datos. Y "Java es OO puro" -> <strong>FALSO</strong>, tiene tipos primitivos (int, float, etc.) que no son objetos.`,
+        examQuestion: {
+          question: 'Herencia, Polimorfismo, Encapsulamiento, Abstraccion e Integridad Referencial son conceptos pilares sobre los que se sustenta la Programacion Orientada a Objetos.',
+          type: 'vf',
+          hint: 'Todos esos conceptos son realmente pilares de la POO? O alguno pertenece a otro dominio?',
+          reasoning: 'Los pilares de la POO son cuatro: Herencia, Polimorfismo, Encapsulamiento y Abstraccion. La Integridad Referencial es un concepto de bases de datos relacionales que establece que toda clave foranea debe referenciar una clave primaria existente. No tiene relacion con los fundamentos de la POO.',
+          answer: 'FALSO. Los pilares de la POO son Herencia, Polimorfismo, Encapsulamiento y Abstraccion. La Integridad Referencial NO es un pilar de la POO; es un concepto de bases de datos relacionales.'
+        }
       }
     ];
 
@@ -1858,6 +1950,75 @@
           reasoning: 'Se necesitan: 1) Caso base: aplanar([], []). 2) Caso cabeza es lista: aplanar la cabeza, aplanar la cola, concatenar. 3) Caso cabeza no es lista: conservar la cabeza y aplanar la cola.',
           answer: 'aplanar([], []). aplanar([H|T], App) :- is_list(H), aplanar(H, AppH), aplanar(T, AppT), append(AppH, AppT, App). aplanar([H|T], [H|App]) :- \\+ is_list(H), aplanar(T, App).'
         }
+      },
+      {
+        id: 'prolog-9',
+        title: 'Logica de Predicados, Clausulas de Horn',
+        critical: false,
+        concept: `<p>Prolog se basa en la <strong>logica de predicados de primer orden</strong>. Una <strong>clausula de Horn</strong> tiene a lo sumo un literal positivo y se escribe como: <code>H :- B1, B2, ..., Bn</code> (si B1 y B2 y... Bn, entonces H). Esta estructura es la base formal de todo programa Prolog (Julian y Alpuente, "Programacion Logica", Cap. 2).</p>
+<p>Tipos de clausulas: un <strong>hecho</strong> es una clausula sin cuerpo (solo cabeza, siempre verdadero): <code>padre(juan, maria).</code> Una <strong>regla</strong> es una clausula con cabeza y cuerpo: <code>abuelo(X,Z) :- padre(X,Y), padre(Y,Z).</code> Una <strong>consulta</strong> (goal) es una clausula sin cabeza: <code>?- abuelo(juan, Z).</code></p>
+<p>El <strong>universo de Herbrand</strong> es el conjunto de todos los terminos ground (sin variables) que se pueden construir con las constantes y functores del programa. El <strong>modelo minimo de Herbrand</strong> es el conjunto minimo de hechos ground que satisfacen el programa, es decir, todo lo que se puede deducir del programa.</p>
+<p>Las soluciones en programacion logica se obtienen mediante un proceso de <strong>unificacion</strong> (matching de terminos) y el <strong>principio de resolucion</strong> (combinar clausulas para derivar nuevas conclusiones). Estos dos mecanismos son la base computacional de Prolog (Bratko, "Prolog Programming for AI").</p>`,
+        realWorld: `Las reglas de negocio en sistemas expertos medicos (diagnostico) funcionan exactamente como clausulas de Horn: SI el paciente tiene fiebre Y tos Y dificultad respiratoria ENTONCES posible neumonia.`,
+        example: {
+          code: `% HECHOS (clausulas sin cuerpo)\npadre(juan, maria).\npadre(maria, pedro).\npadre(juan, carlos).\n\n% REGLA (clausula con cabeza y cuerpo)\n% Clausula de Horn: abuelo(X,Z) <- padre(X,Y) AND padre(Y,Z)\nabuelo(X, Z) :- padre(X, Y), padre(Y, Z).\n\n% En notacion logica:\n% Para todo X,Z: abuelo(X,Z) si existe Y tal que padre(X,Y) ^ padre(Y,Z)\n\n% CONSULTA (clausula sin cabeza = goal)\n?- abuelo(juan, pedro).\n% Prolog busca: padre(juan, Y), padre(Y, pedro)\n% Unifica Y=maria, verifica padre(maria, pedro) -> true\n% Respuesta: true\n\n?- abuelo(juan, Quien).\n% Quien = pedro\n\n% Universo de Herbrand: {juan, maria, pedro, carlos}\n% Modelo minimo de Herbrand:\n% {padre(juan,maria), padre(maria,pedro), padre(juan,carlos),\n%  abuelo(juan,pedro)}`,
+          language: 'prolog',
+          explanation: `Los hechos son clausulas de Horn sin cuerpo (verdades incondicionales). La regla abuelo/2 es una clausula con cabeza y cuerpo. La consulta es una clausula sin cabeza que Prolog intenta demostrar. El modelo minimo de Herbrand contiene todo lo deducible del programa.`
+        },
+        trap: `OJO: En programacion logica, las soluciones se obtienen mediante un proceso de <strong>unificacion</strong> y el <strong>principio de resolucion</strong>. Esto es <strong>VERDADERO</strong>. La unificacion empareja terminos y la resolucion deriva nuevas clausulas.`,
+        examQuestion: {
+          question: 'En programacion logica, la eficiencia de un programa se basa en la unificacion y el principio de resolucion.',
+          type: 'vf',
+          hint: 'Como encuentra Prolog las respuestas a las consultas? Que mecanismos usa internamente?',
+          reasoning: 'Prolog utiliza dos mecanismos fundamentales: la unificacion (que empareja terminos sustituyendo variables) y el principio de resolucion (que combina clausulas eliminando literales complementarios para derivar nuevas conclusiones). Estos son la base computacional del paradigma logico.',
+          answer: 'VERDADERO. La unificacion (matching de terminos con sustitucion de variables) y el principio de resolucion (derivacion de nuevas clausulas) son los mecanismos fundamentales sobre los que se basa la eficiencia y el funcionamiento de un programa logico.'
+        }
+      },
+      {
+        id: 'prolog-10',
+        title: 'Modos de Inferencia, Principio de Resolucion',
+        critical: false,
+        concept: `<p><strong>SLD-Resolution</strong> (Selective Linear Definite clause resolution) es el mecanismo de inferencia que usa Prolog. El proceso: (1) se selecciona el objetivo mas a la izquierda (<strong>regla de computacion</strong>), (2) se buscan clausulas de arriba hacia abajo en el programa (<strong>regla de busqueda</strong>), (3) se intenta unificar el objetivo con la cabeza de cada clausula (Julian y Alpuente, "Programacion Logica", Cap. 3).</p>
+<p><strong>Modus Ponens</strong>: si P implica Q, y P es verdadero, entonces Q es verdadero. Es la regla de inferencia basica. <strong>Resolucion</strong>: dadas dos clausulas con literales complementarios, se combinan eliminando esos literales para obtener una nueva clausula (resolvente).</p>
+<p>El <strong>arbol de resolucion</strong> (arbol SLD) muestra todas las ramas exploradas por Prolog al resolver una consulta. Cada nodo es un conjunto de subobjetivos, cada arista es una aplicacion de una clausula con su sustitucion. Las ramas exitosas terminan en la clausula vacia (true). Las ramas fallidas son podadas por backtracking.</p>
+<p>La <strong>respuesta computada</strong> es la sustitucion (binding de variables) que hace verdadera la consulta. Puede haber multiples respuestas computadas, obtenidas via backtracking explorando distintas ramas del arbol SLD.</p>`,
+        realWorld: `Los motores de reglas en IA (como en chatbots inteligentes) usan el mismo principio de resolucion para deducir respuestas a partir de una base de conocimiento. Prolog fue pionero en esta tecnica.`,
+        example: {
+          code: `% Programa:\nprogenitor(ana, luis).\nprogenitor(luis, pedro).\nancestro(X, Y) :- progenitor(X, Y).\nancestro(X, Y) :- progenitor(X, Z), ancestro(Z, Y).\n\n% Consulta: ?- ancestro(ana, pedro).\n\n% Arbol SLD de resolucion:\n% Goal: ancestro(ana, pedro)\n%   |\n%   |-- Clausula 1: ancestro(X,Y) :- progenitor(X,Y)\n%   |   Unifica: X=ana, Y=pedro\n%   |   Nuevo goal: progenitor(ana, pedro)\n%   |   -> FALLO (no existe ese hecho)\n%   |\n%   |-- Clausula 2: ancestro(X,Y) :- progenitor(X,Z), ancestro(Z,Y)\n%       Unifica: X=ana, Y=pedro\n%       Nuevo goal: progenitor(ana, Z), ancestro(Z, pedro)\n%       |\n%       |-- Z=luis (unifica con progenitor(ana, luis))\n%           Nuevo goal: ancestro(luis, pedro)\n%           |\n%           |-- Clausula 1: progenitor(luis, pedro)\n%               -> EXITO! Respuesta computada: true\n\n% Prolog explora de izquierda a derecha (regla de computacion)\n% y de arriba a abajo (regla de busqueda)`,
+          language: 'prolog',
+          explanation: `Se muestra el arbol SLD paso a paso. Prolog selecciona el subobjetivo izquierdo, busca clausulas de arriba a abajo, e intenta unificar. La primera rama falla y Prolog hace backtracking. La segunda rama tiene exito tras encontrar la cadena progenitor(ana,luis) + progenitor(luis,pedro).`
+        },
+        trap: `CUIDADO: La semantica <strong>PROCEDURAL</strong> depende del orden de clausulas y subobjetivos. La catedra considera que la semantica declarativa <strong>TAMBIEN depende del orden</strong>. Si te preguntan si la semantica declarativa es independiente del orden, la respuesta segun la catedra es <strong>FALSO</strong>.`,
+        examQuestion: {
+          question: 'La semantica declarativa de un programa logico es independiente del orden de las clausulas y de la regla de computacion utilizada.',
+          type: 'vf',
+          hint: 'La semantica declarativa deberia ser independiente del orden, pero que dice la catedra al respecto?',
+          reasoning: 'Teoricamente, la semantica declarativa (basada en el modelo minimo de Herbrand) deberia ser independiente del orden. Sin embargo, la catedra de esta materia considera que, en la practica de Prolog, la semantica declarativa tambien se ve afectada por el orden de las clausulas y la regla de computacion, ya que Prolog puede no terminar o dar resultados diferentes segun el orden.',
+          answer: 'FALSO (segun la catedra). Aunque en teoria la semantica declarativa deberia ser independiente del orden, la catedra considera que en Prolog la semantica declarativa tambien depende del orden de las clausulas y de la regla de computacion utilizada.'
+        }
+      },
+      {
+        id: 'prolog-11',
+        title: 'Fundamentos del Paradigma Logico, Areas de Aplicacion',
+        critical: false,
+        concept: `<p>El <strong>paradigma logico</strong> es <strong>declarativo</strong>: se especifica <strong>QUE</strong> se quiere obtener, no COMO obtenerlo. Esta basado en la <strong>logica matematica</strong>, especificamente en el Calculo de Predicados de primer orden (Julian y Alpuente, "Programacion Logica", Cap. 1).</p>
+<p><strong>Prolog</strong> = PROgrammation en LOGique, creado en 1972 por Alain Colmerauer. Sus mecanismos basicos son: <strong>unificacion</strong> (matching de terminos), <strong>estructuras de datos basadas en arboles</strong> (terminos compuestos), y <strong>backtracking automatico</strong> (busqueda exhaustiva de soluciones).</p>
+<p><strong>Areas de aplicacion</strong>: Inteligencia Artificial, Sistemas Expertos (diagnostico medico, configuracion), Procesamiento de Lenguaje Natural, Bases de Datos Deductivas, Verificacion de Software, planificacion automatica.</p>
+<p>La <strong>asuncion de mundo cerrado</strong> (CWA - Closed World Assumption) significa que todo lo que no esta en el programa ni se puede deducir de el se considera <strong>falso</strong>. Esto es la base de la <strong>negacion como fallo</strong> (<code>\\+</code> en Prolog): si Prolog no puede demostrar P, asume que P es falso. Esta negacion <strong>NO es la negacion logica clasica</strong>.</p>`,
+        realWorld: `Watson de IBM, que gano Jeopardy!, usa programacion logica internamente para razonar sobre su base de conocimiento y deducir respuestas. Los sistemas expertos medicos como MYCIN tambien se basaron en este paradigma.`,
+        example: {
+          code: `% Sistema experto simple en Prolog\n% Base de conocimiento (hechos)\ntiene_sintoma(paciente1, fiebre).\ntiene_sintoma(paciente1, tos).\ntiene_sintoma(paciente1, dolor_garganta).\ntiene_sintoma(paciente2, fiebre).\ntiene_sintoma(paciente2, erupciones).\n\n% Reglas de diagnostico\ndiagnostico(X, gripe) :- \n    tiene_sintoma(X, fiebre),\n    tiene_sintoma(X, tos),\n    tiene_sintoma(X, dolor_garganta).\n\ndiagnostico(X, sarampion) :-\n    tiene_sintoma(X, fiebre),\n    tiene_sintoma(X, erupciones).\n\n% Consultas (declarativas: QUE, no COMO)\n?- diagnostico(paciente1, Enfermedad).\n% Enfermedad = gripe\n\n?- diagnostico(paciente2, Enfermedad).\n% Enfermedad = sarampion\n\n% Negacion como fallo (asuncion de mundo cerrado)\n?- tiene_sintoma(paciente1, erupciones).\n% false (no esta en la base -> se asume falso)\n\n?- \\+ tiene_sintoma(paciente1, erupciones).\n% true (negacion como fallo: no se puede probar, entonces es verdadero)`,
+          language: 'prolog',
+          explanation: `El sistema experto define hechos (sintomas) y reglas (diagnosticos). Las consultas son declarativas: preguntamos QUE enfermedad tiene el paciente, no COMO buscarla. La negacion como fallo (\\+) asume falso lo que no puede demostrar (mundo cerrado).`
+        },
+        trap: `OJO: En Prolog, <code>\\+</code> (not) <strong>NO es la negacion logica clasica</strong>. Es <strong>negacion como fallo</strong>: si no puedo demostrar P, asumo que P es falso. Esto es la <strong>asuncion de mundo cerrado</strong>. Si te preguntan si la negacion de Prolog es la negacion clasica, es <strong>FALSO</strong>.`,
+        examQuestion: {
+          question: 'En Prolog, la negacion implementada corresponde a la negacion de la logica clasica.',
+          type: 'vf',
+          hint: 'La negacion de Prolog (\\+) es "no puedo demostrar P". Es lo mismo que la negacion clasica "P es falso"?',
+          reasoning: 'La negacion en Prolog es "negacion como fallo" (negation as failure): si Prolog no puede demostrar P, concluye que P es falso. Esto se basa en la asuncion de mundo cerrado (lo que no esta en el programa es falso). La negacion logica clasica es diferente: P es falso independientemente de lo que se pueda demostrar. Son conceptos fundamentalmente distintos.',
+          answer: 'FALSO. La negacion de Prolog es "negacion como fallo" (negation as failure), basada en la asuncion de mundo cerrado. NO es la negacion logica clasica. Si Prolog no puede demostrar P, asume que P es falso, lo cual es diferente de afirmar logicamente que P es falso.'
+        }
       }
     ];
 
@@ -2028,6 +2189,76 @@
           hint: 'En un lenguaje funcional puro, hay variables mutables? Se pueden usar bucles for/while?',
           reasoning: 'En el modelo funcional puro (como Haskell): no hay variables mutables ni asignacion destructiva. Sin variables mutables, los bucles imperativos (for, while) no son posibles porque requieren un contador o condicion mutable. La recursion es la unica forma de expresar iteracion, reemplazando completamente a los procesos repetitivos imperativos.',
           answer: 'VERDADERO. En el modelo funcional puro, la recursion es el principal mecanismo de control de flujo. La ausencia de variables locales mutables y asignacion destructiva hace imposible usar bucles imperativos, por lo que la recursion los sustituye completamente.'
+        }
+      },
+      {
+        id: 'haskell-8',
+        title: 'Enunciados type y data, Tipos Definidos por Usuario',
+        critical: true,
+        concept: `<p>El enunciado <code>type</code> crea <strong>sinonimos de tipo</strong> (como typedef en C): <code>type String = [Char]</code>, <code>type Punto = (Float, Float)</code>. No crea un tipo nuevo, solo un alias. Es util para legibilidad (Ruiz, Jimenez y Blas, "Razonando con Haskell", Cap. 4).</p>
+<p>El enunciado <code>data</code> crea <strong>tipos nuevos</strong> con constructores de datos: <code>data Bool = True | False</code>, <code>data Color = Rojo | Verde | Azul</code>. Los constructores pueden tener argumentos: <code>data Forma = Circulo Float | Rectangulo Float Float</code>. El <code>|</code> separa alternativas (tipo suma/union).</p>
+<p><strong>Tipos recursivos</strong>: <code>data Arbol a = Hoja | Nodo a (Arbol a) (Arbol a)</code> define un arbol binario generico. <code>data Lista a = Vacia | Cons a (Lista a)</code> define una lista. Se procesan con <strong>pattern matching</strong> sobre los constructores.</p>
+<p><code>deriving (Show, Eq, Ord)</code> genera automaticamente instancias de clases de tipo: Show para mostrar, Eq para comparar igualdad, Ord para ordenar. Sin deriving Show, no se puede mostrar el tipo en consola.</p>
+<p>Los tipos definidos con <code>data</code> son la base para modelar <strong>arboles, grafos y estructuras complejas</strong> en Haskell. Son fundamentales en examenes recientes, donde se pide definir el tipo, crear instancias y escribir funciones recursivas sobre ellos.</p>`,
+        realWorld: `Los tipos algebraicos de Haskell inspiraron los enums con datos en Rust, Swift y Kotlin. Un Result&lt;T,E&gt; = Ok T | Err E es exactamente un data type. En compiladores, los AST (arboles de sintaxis) se modelan con data.`,
+        example: {
+          code: "-- type: sinonimo de tipo (alias)\ntype Nombre = String\ntype Edad = Int\ntype Persona = (Nombre, Edad)\n\n-- data: tipo nuevo con constructores\ndata Cardinal = Norte | Sur | Este | Oeste\n  deriving (Show, Eq)\n\ndata Recorrido = Derecho Cardinal Int\n               | Curva Cardinal Cardinal Int\n  deriving (Show)\n\n-- Arbol binario generico\ndata Arbol a = Hoja | Nodo a (Arbol a) (Arbol a)\n  deriving (Show, Eq)\n\n-- Crear instancias\narbolEj :: Arbol Int\narbolEj = Nodo 1 (Nodo 2 Hoja Hoja) (Nodo 3 Hoja Hoja)\n--       1\n--      / \\\n--     2   3\n\n-- Funciones recursivas sobre arboles\naltura :: Arbol a -> Int\naltura Hoja = 0\naltura (Nodo _ izq der) = 1 + max (altura izq) (altura der)\n\ncantidad :: Arbol a -> Int\ncantidad Hoja = 0\ncantidad (Nodo _ izq der) = 1 + cantidad izq + cantidad der\n\nmostrar :: Show a => Arbol a -> String\nmostrar Hoja = \".\"\nmostrar (Nodo x izq der) = \"(\" ++ mostrar izq ++ show x ++ mostrar der ++ \")\"\n\n-- Ejemplos de uso\n-- altura arbolEj     => 2\n-- cantidad arbolEj   => 3\n-- mostrar arbolEj    => \"(.2.)1(.3.)\"",
+          language: 'haskell',
+          explanation: `type crea alias (Nombre es String). data crea tipos nuevos (Cardinal, Recorrido, Arbol). Los arboles se definen recursivamente con Hoja (caso base) y Nodo (caso recursivo). Las funciones usan pattern matching sobre los constructores para recorrer la estructura.`
+        },
+        trap: `MUY IMPORTANTE: En examenes recientes (Jul 2025, Feb 2026) aparecen arboles definidos con <code>data</code>. Debes saber: definir el data, crear instancias, y escribir funciones recursivas (cantidad, profundidad, mostrar). Si te dan <code>data Arbol a = Hoja | Nodo a (Arbol a) (Arbol a)</code>, la funcion altura es: <code>altura Hoja = 0; altura (Nodo _ izq der) = 1 + max (altura izq) (altura der)</code>.`,
+        examQuestion: {
+          question: 'Dado el tipo data Arbol a = Hoja | Nodo a (Arbol a) (Arbol a), crear un arbol ejemplo de tipo Arbol Int e implementar una funcion altura que calcule la profundidad del arbol.',
+          type: 'code',
+          hint: 'La altura de una Hoja es 0. La altura de un Nodo es 1 + el maximo entre la altura del subarbol izquierdo y derecho.',
+          reasoning: 'Se necesita: (1) Un arbol ejemplo usando los constructores Hoja y Nodo, por ejemplo: Nodo 1 (Nodo 2 Hoja Hoja) (Nodo 3 Hoja Hoja). (2) Funcion altura con dos ecuaciones: caso base Hoja = 0, caso recursivo Nodo = 1 + max de alturas de subarboles.',
+          answer: 'arbolEj = Nodo 1 (Nodo 2 Hoja Hoja) (Nodo 3 Hoja Hoja). altura :: Arbol a -> Int; altura Hoja = 0; altura (Nodo _ izq der) = 1 + max (altura izq) (altura der). Resultado: altura arbolEj = 2.'
+        }
+      },
+      {
+        id: 'haskell-9',
+        title: 'Calculo Lambda, Fundamentos del Paradigma Funcional',
+        critical: false,
+        concept: `<p>El <strong>calculo lambda</strong> (Alonzo Church, 1930s) es la base teorica de la programacion funcional. Define funciones anonimas con la sintaxis: <strong>&lambda;variable.expresion</strong>. Ejemplo: (&lambda;x. x*x)(3) = 9 (Bird, "Introduccion a la Programacion Funcional con Haskell", Cap. 1).</p>
+<p>En Haskell, las expresiones lambda se escriben con <code>\\</code>: <code>(\\x -> x*x) 3</code> = 9. Multiples parametros: <code>(\\x y z -> x+y+z) 1 2 3</code> = 6. Las lambdas son funciones anonimas que se pueden usar inline sin necesidad de darles nombre.</p>
+<p><strong>Reglas del calculo lambda</strong>: <strong>alfa-conversion</strong> (renombrar variables ligadas sin cambiar significado: &lambda;x.x = &lambda;y.y), <strong>beta-reduction</strong> (aplicar funcion: (&lambda;x.x+1) 5 = 5+1 = 6), <strong>eta-conversion</strong> (simplificar: &lambda;x.f x = f cuando x no aparece libre en f).</p>
+<p>Principios fundamentales: las funciones son <strong>ciudadanos de primera clase</strong> (pueden pasarse como argumento y retornarse como resultado). <strong>Transparencia referencial</strong>: misma entrada siempre produce misma salida. No hay <strong>efectos laterales</strong> ni <strong>asignacion destructiva</strong>. El modelo funcional es un modelo teorico de computacion <strong>equivalente a las maquinas de Turing</strong> en poder expresivo.</p>`,
+        realWorld: `Las funciones arrow (=>) de JavaScript y las lambdas de Python (lambda x: x*2) vienen directamente del calculo lambda de Church. Cada vez que usas una funcion anonima en cualquier lenguaje moderno, estas usando calculo lambda.`,
+        example: {
+          code: "-- Expresiones lambda en Haskell\ncuadrado = \\x -> x * x\ncuadrado 5    -- 25\n\nsuma = \\x y -> x + y\nsuma 3 4      -- 7\n\n-- Lambda con multiples parametros\nf = \\x y z -> ((x+y)*z - x*y)\nf 3 4 2       -- (7*2 - 12) = 14 - 12 = 2\n\n-- Beta-reduction paso a paso:\n-- (\\x y z -> ((x+y)*z - x*y)) 3 4 2\n-- Sustituir x=3: (\\y z -> ((3+y)*z - 3*y)) 4 2\n-- Sustituir y=4: (\\z -> ((3+4)*z - 3*4)) 2\n-- Sustituir z=2: ((3+4)*2 - 3*4)\n-- = (7*2 - 12) = 14 - 12 = 2\n\n-- Expresion lambda con booleanos\ng = \\x y z -> ((x+y)*z - x*y) > 0 && even(x+y)\ng 3 4 2  -- 2 > 0 && even 7 = True && False = False\n\n-- Lambdas como argumentos (funciones de primera clase)\nmap (\\x -> x * 2) [1,2,3]    -- [2,4,6]\nfilter (\\x -> x > 3) [1,5,2,4]  -- [5,4]\n\n-- Eta-conversion: simplificar\n-- \\x -> f x  equivale a  f\nincrementar = \\x -> (+1) x  -- equivale a (+1)\nincrementar' = (+1)          -- eta-reducida",
+          language: 'haskell',
+          explanation: `Las lambdas (\\x -> ...) son funciones anonimas. Beta-reduction aplica la funcion sustituyendo los argumentos paso a paso. Las lambdas son ciudadanos de primera clase: se pasan a map/filter como argumentos. Eta-conversion simplifica \\x -> f x a simplemente f.`
+        },
+        trap: `OJO: Si te preguntan el tipo de expresion <code>(\\x y z -> ...)</code>, la respuesta es <strong>expresion lambda</strong>. Y si te piden evaluarla, aplica <strong>beta-reduction</strong> paso a paso sustituyendo los argumentos de izquierda a derecha.`,
+        examQuestion: {
+          question: 'Indicar como se llama el siguiente tipo de expresion y evaluar su resultado: (\\x y z -> ((x+y)*z - x*y) > 0 && even(x+y)) 3 4 2',
+          type: 'code',
+          hint: 'Es una expresion lambda. Sustituye x=3, y=4, z=2 paso a paso y evalua la expresion resultante.',
+          reasoning: 'Es una expresion lambda (funcion anonima). Evaluacion por beta-reduction: sustituir x=3, y=4, z=2. Calcular: (3+4)*2 - 3*4 = 14 - 12 = 2. Luego: 2 > 0 = True. even(3+4) = even 7 = False. True && False = False.',
+          answer: 'Tipo: expresion lambda. Evaluacion: (\\x y z -> ((x+y)*z - x*y) > 0 && even(x+y)) 3 4 2. Sustituimos: ((3+4)*2 - 3*4) > 0 && even(3+4) = (14 - 12) > 0 && even 7 = 2 > 0 && False = True && False = False.'
+        }
+      },
+      {
+        id: 'haskell-10',
+        title: 'Paradigma Funcional: Fundamentos, Lenguajes, Aplicaciones',
+        critical: false,
+        concept: `<p><strong>Historia</strong>: LISP (1958, McCarthy) fue el primer lenguaje funcional. Luego vinieron ML, Miranda, y finalmente <strong>Haskell</strong> (1990), un lenguaje funcional <strong>puro</strong> con evaluacion perezosa (Bird, "Introduccion a la Programacion Funcional con Haskell", Cap. 1; Ruiz et al., "Razonando con Haskell", Cap. 1).</p>
+<p><strong>Caracteristicas principales</strong>: (1) <strong>Funciones de orden superior</strong>: se pasan como datos (map, filter, foldr). (2) <strong>Tipado fuerte con inferencia de tipos</strong>: el compilador deduce los tipos. (3) <strong>Evaluacion perezosa</strong> (lazy): las expresiones se evaluan solo cuando se necesitan. (4) <strong>Transparencia referencial</strong>: sin efectos laterales. (5) <strong>Currificacion</strong>: toda funcion de multiples argumentos es una cadena de funciones de un argumento.</p>
+<p>No hay concepto de <strong>posicion de memoria</strong> ni <strong>estado mutable</strong>. Los bucles se reemplazan por <strong>recursion</strong>. El operador <code>:</code> construye listas (<code>1:[2,3] = [1,2,3]</code>). El operador <code>++</code> concatena listas. <code>map</code>, <code>filter</code>, <code>foldr</code> son funciones de orden superior fundamentales.</p>
+<p>La programacion funcional promueve: <strong>menos errores</strong> (sin efectos laterales), <strong>paralelizacion natural</strong> (funciones puras son independientes), <strong>composicion de funciones</strong> (combinar funciones pequenas para crear complejas), y <strong>razonamiento ecuacional</strong> (demostrar propiedades del programa como ecuaciones matematicas).</p>`,
+        realWorld: `Facebook usa Haskell para su filtro de spam (Sigma). WhatsApp usa Erlang (funcional) para manejar millones de conexiones simultaneas. Bancos como Jane Street usan OCaml (funcional) para trading algoritmico de alta frecuencia.`,
+        example: {
+          code: "-- Estilo imperativo (pseudocodigo) vs funcional\n-- IMPERATIVO: sum = 0; for(i=1..n) sum += i*i\n-- FUNCIONAL:\nsumaCuadrados :: Int -> Int\nsumaCuadrados n = sum (map (\\x -> x*x) [1..n])\n-- sumaCuadrados 4 = sum (map (\\x->x*x) [1,2,3,4])\n--                = sum [1,4,9,16] = 30\n\n-- Funciones de orden superior\ndobles = map (*2) [1,2,3,4]        -- [2,4,6,8]\npares = filter even [1..10]         -- [2,4,6,8,10]\ntotal = foldr (+) 0 [1,2,3,4]      -- 10\n\n-- Composicion de funciones\nimparesMayores5 = filter (>5) . filter odd\nimparesMayores5 [1..10]             -- [7,9]\n\n-- Currificacion\nsuma :: Int -> Int -> Int\nsuma x y = x + y\nincremento = suma 1    -- aplicacion parcial\nincremento 5           -- 6\n\n-- Operador : construye listas\nlista = 1 : 2 : 3 : []     -- [1,2,3]\nlista2 = 1 : [2,3]          -- [1,2,3]\n\n-- Operador ++ concatena listas\nsaludo = \"Hola\" ++ \" \" ++ \"Mundo\"  -- \"Hola Mundo\"\n\n-- NO hay estado mutable:\n-- x = 5; x = x + 1  -- ERROR en Haskell",
+          language: 'haskell',
+          explanation: `Se contrasta el estilo imperativo (bucles, variables mutables) con el funcional (map, recursion, inmutabilidad). map, filter, foldr son funciones de orden superior. La currificacion permite aplicacion parcial (suma 1 crea una nueva funcion). No hay asignacion destructiva.`
+        },
+        trap: `CUIDADO: "Los lenguajes funcionales implementan <strong>herencia multiple</strong>" -> <strong>FALSO</strong>. No hay herencia en funcional (la herencia es POO). Y "Haskell es un lenguaje <strong>pseudocompilado</strong>" -> depende de la implementacion, pero la catedra usa WinHugs/GHCi que es <strong>INTERPRETADO</strong>.`,
+        examQuestion: {
+          question: 'Los lenguajes funcionales implementan la herencia multiple.',
+          type: 'vf',
+          hint: 'La herencia es un concepto de que paradigma? Existe herencia en programacion funcional?',
+          reasoning: 'La herencia (simple o multiple) es un concepto del paradigma orientado a objetos. En el paradigma funcional no existe el concepto de herencia, clases (en el sentido OO), ni jerarquias de clases. La reutilizacion de codigo en funcional se logra mediante composicion de funciones, funciones de orden superior y polimorfismo parametrico, no mediante herencia.',
+          answer: 'FALSO. La herencia multiple es un concepto del paradigma orientado a objetos. Los lenguajes funcionales no implementan herencia (ni simple ni multiple). La reutilizacion de codigo se logra mediante composicion de funciones y funciones de orden superior.'
         }
       }
     ];
